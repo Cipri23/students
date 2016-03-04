@@ -94,7 +94,7 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
             }
         } else {
             excelParser = new ExcelParser(file.getAbsolutePath());
-            List<Student> studentList = excelParser.parse();
+            List<Student> studentList = excelParser.parseFile();
 //            Intent intent = new Intent(this, ReadSelectedFile.class);
 //            intent.putExtra(getString(R.string.file_absolute_path), file.getAbsolutePath());
 //            startActivity(intent);

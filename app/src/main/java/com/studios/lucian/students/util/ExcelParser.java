@@ -13,7 +13,7 @@ public class ExcelParser {
 
     }
 
-    public List<Student> parse() {
+    public List<Student> parseFile() {
         return null;
     }
 }
