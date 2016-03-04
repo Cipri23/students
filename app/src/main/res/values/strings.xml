@@ -8,6 +8,7 @@
     <string name="students_from_excel">Students from Excel</string>
     <string name="no_data_explorer">No Data</string>
     <string name="home">Home</string>
+    <string name="location">"Location: "</string>
 
     <string-array name="Planets">
         <item>Sun</item>

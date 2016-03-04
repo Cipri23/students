@@ -55,7 +55,7 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
     }
 
     private void getDir(String dirPath) {
-        myPath.setText("Location: " + dirPath);
+        myPath.setText(String.format("%s%s", getString(R.string.location), dirPath));
         item = new ArrayList<>();
         path = new ArrayList<>();
         File file = new File(dirPath);
@@ -94,7 +94,7 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
             }
         } else {
             excelParser = new ExcelParser(file.getAbsolutePath());
-            List<Student> studentList = excelParser.parseFile();
+            List<Student> studentsList = excelParser.getStudentsList();
 //            Intent intent = new Intent(this, ReadSelectedFile.class);
 //            intent.putExtra(getString(R.string.file_absolute_path), file.getAbsolutePath());
 //            startActivity(intent);
