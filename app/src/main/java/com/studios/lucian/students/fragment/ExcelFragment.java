@@ -13,6 +13,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.studios.lucian.students.R;
+import com.studios.lucian.students.model.Student;
+import com.studios.lucian.students.util.ExcelParser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,6 +26,8 @@ import java.util.List;
 public class ExcelFragment extends android.support.v4.app.ListFragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = ExcelFragment.class.getSimpleName();
+
+    private ExcelParser excelParser;
     private List<String> item = null;
     private List<String> path = null;
     private String root;
@@ -89,6 +93,8 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
                 new AlertDialog.Builder(this.getActivity()).setTitle("[" + file.getName() + "] folder can't be read!").setPositiveButton("OK", null).show();
             }
         } else {
+            excelParser = new ExcelParser(file.getAbsolutePath());
+            List<Student> studentList = excelParser.parse();
 //            Intent intent = new Intent(this, ReadSelectedFile.class);
 //            intent.putExtra(getString(R.string.file_absolute_path), file.getAbsolutePath());
 //            startActivity(intent);
