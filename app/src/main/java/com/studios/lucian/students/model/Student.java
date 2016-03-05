@@ -9,10 +9,7 @@ public class Student {
 
     @Override
     public String toString() {
-        return "Student{" +
-                "_surname='" + _surname + '\'' +
-                ", _name='" + _name + '\'' +
-                '}';
+        return _name + " " + _surname;
     }
 
     @Override

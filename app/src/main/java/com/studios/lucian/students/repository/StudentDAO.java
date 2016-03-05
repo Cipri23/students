@@ -10,6 +10,7 @@ import android.util.Log;
 import com.studios.lucian.students.model.Student;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -87,6 +88,7 @@ public class StudentDAO extends SQLiteOpenHelper {
         database.close();
 
         Log.v(TAG, "Number of retrieved rows: " + retrievedRows);
+        Log.v(TAG, Arrays.toString(studentList.toArray()));
         return studentList;
     }
 }

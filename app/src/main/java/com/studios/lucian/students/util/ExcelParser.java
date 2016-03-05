@@ -52,7 +52,7 @@ public class ExcelParser {
     }
 
     public List<Student> getStudentsList() {
-        Log.v(TAG, Arrays.toString(studentsList.toArray()));
+//        Log.v(TAG, Arrays.toString(studentsList.toArray()));
         return studentsList;
     }
 }

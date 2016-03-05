@@ -1,9 +1,11 @@
 package com.studios.lucian.students.fragment;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.studios.lucian.students.R;
-import com.studios.lucian.students.model.Student;
+import com.studios.lucian.students.util.StudentsDBHandler;
 import com.studios.lucian.students.util.ExcelParser;
 
 import java.io.File;
@@ -27,8 +29,6 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
 
     private static final String TAG = ExcelFragment.class.getSimpleName();
 
-    private ExcelParser excelParser;
-    private List<String> item = null;
     private List<String> path = null;
     private String root;
     private TextView myPath;
@@ -56,7 +56,7 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
 
     private void getDir(String dirPath) {
         myPath.setText(String.format("%s%s", getString(R.string.location), dirPath));
-        item = new ArrayList<>();
+        List<String> item = new ArrayList<>();
         path = new ArrayList<>();
         File file = new File(dirPath);
         File[] files = file.listFiles();
@@ -93,11 +93,16 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
                 new AlertDialog.Builder(this.getActivity()).setTitle("[" + file.getName() + "] folder can't be read!").setPositiveButton("OK", null).show();
             }
         } else {
-            excelParser = new ExcelParser(file.getAbsolutePath());
-            List<Student> studentsList = excelParser.getStudentsList();
-//            Intent intent = new Intent(this, ReadSelectedFile.class);
-//            intent.putExtra(getString(R.string.file_absolute_path), file.getAbsolutePath());
-//            startActivity(intent);
+            ExcelParser excelParser = new ExcelParser(file.getAbsolutePath());
+            StudentsDBHandler studentsDBHandler = new StudentsDBHandler(getActivity());
+            studentsDBHandler.clearStudents();
+            studentsDBHandler.insertStudents(excelParser.getStudentsList());
+
+            MainFragment mainFragment = new MainFragment();
+            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.main_content, mainFragment);
+            fragmentTransaction.commit();
         }
     }
 }
