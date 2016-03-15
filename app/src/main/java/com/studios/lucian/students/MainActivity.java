@@ -52,8 +52,8 @@ public class MainActivity extends AppCompatActivity
         }
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.getMenu().getItem(0).setChecked(true);
-
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.studios.lucian.students.fragment;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,8 +15,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.studios.lucian.students.R;
-import com.studios.lucian.students.util.StudentsDBHandler;
 import com.studios.lucian.students.util.ExcelParser;
+import com.studios.lucian.students.util.StudentsDBHandler;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -103,6 +103,8 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.main_content, mainFragment);
             fragmentTransaction.commit();
+            NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+            navigationView.getMenu().getItem(0).setChecked(true);
         }
     }
 }
