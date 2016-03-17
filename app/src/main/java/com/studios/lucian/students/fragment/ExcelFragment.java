@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -40,7 +41,8 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
-        View rootView = inflater.inflate(R.layout.fragment_from_excel, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_excel, container, false);
+
         myPath = (TextView) rootView.findViewById(R.id.path);
         root = Environment.getExternalStorageDirectory().getPath();
         getDir(root);
@@ -78,7 +80,7 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
                 }
             }
         }
-        ArrayAdapter<String> fileList = new ArrayAdapter<>(this.getActivity(), R.layout.row, item);
+        ArrayAdapter<String> fileList = new ArrayAdapter<>(this.getActivity(), R.layout.item_explorer, item);
         setListAdapter(fileList);
     }
 
