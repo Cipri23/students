@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import com.studios.lucian.students.fragment.GroupTabFragment;
 import com.studios.lucian.students.fragment.MovieFragment;
 
+import java.util.List;
+
 /**
  * Created with Love by Lucian and Pi on 15.03.2016.
  */
@@ -14,6 +16,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
     private int numTabs = 0;
 
+    private List<Fragment> groupsFragments;
     public PageAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -21,6 +24,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         Fragment fragment = null;
+        //return new GroupTabFragment(position);
         switch (position) {
             case 0:
                 fragment = new GroupTabFragment();
@@ -30,6 +34,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
                 break;
         }
         return fragment;
+        // return new GroupTabFragment(position);
     }
 
     @Override

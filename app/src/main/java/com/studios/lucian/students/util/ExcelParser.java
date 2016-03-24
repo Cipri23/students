@@ -22,19 +22,19 @@ import jxl.read.biff.BiffException;
  */
 public class ExcelParser {
 
-    private String _absolutePath;
-    private List<Student> studentsList;
     private final static String TAG = ExcelParser.class.getSimpleName();
 
-    public ExcelParser(String absolutePath) {
-        this._absolutePath = absolutePath;
+    private String groupNumber;
+    private List<Student> studentsList;
+
+    public ExcelParser(String number) {
         studentsList = new ArrayList<>();
-        parseFile();
+        this.groupNumber = number;
     }
 
-    public void parseFile() {
+    public void parseFile(String absolutePath) {
         try {
-            File file = new File(_absolutePath);
+            File file = new File(absolutePath);
             FileInputStream fileInputStream = new FileInputStream(file);
             Workbook workbook = Workbook.getWorkbook(fileInputStream);
             Sheet sheet = workbook.getSheet(0);
@@ -48,11 +48,15 @@ public class ExcelParser {
     }
 
     private void parseRow(Cell[] row) {
-        studentsList.add(new Student(row[2].getContents(), row[4].getContents()));
+        studentsList.add(new Student(groupNumber, row[1].getContents(), row[2].getContents(), row[4].getContents()));
     }
 
     public List<Student> getStudentsList() {
-//        Log.v(TAG, Arrays.toString(studentsList.toArray()));
+        return studentsList;
+    }
+
+    public List<Student> getStudentsList(String absolutePath) {
+        parseFile(absolutePath);
         return studentsList;
     }
 }

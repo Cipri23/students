@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.studios.lucian.students.fragment.CsvFragment;
 import com.studios.lucian.students.fragment.ExcelFragment;
 import com.studios.lucian.students.fragment.MainFragment;
 
@@ -35,28 +36,32 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        if (drawer != null) {
-//            drawer.setDrawerListener(toggle);
-//        }
-        toggle.syncState();
 
+        toggle.syncState();
+        setupMainFragment(savedInstanceState);
+    }
+
+    private void setupMainFragment(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.main_content, new MainFragment()).commit();
         }
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.getMenu().getItem(0).setChecked(true);
-        navigationView.setNavigationItemSelectedListener(this);
-
+        if (navigationView != null) {
+            navigationView.getMenu().getItem(0).setChecked(true);
+            navigationView.setNavigationItemSelectedListener(this);
+        }
     }
 
     @Override
     public void onBackPressed() {
         Log.v(TAG, "onBackPressed");
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+        if (drawer != null) {
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -79,7 +84,6 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -89,12 +93,12 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
         int id = item.getItemId();
 
-        if (id == R.id.nav_excel_file) {
-            fragment = new ExcelFragment();
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_home) {
             fragment = new MainFragment();
-        } else if (id == R.id.nav_slideshow) {
-
+        } else if (id == R.id.nav_excel_file) {
+            fragment = new ExcelFragment();
+        } else if (id == R.id.nav_csv_file) {
+            fragment = new CsvFragment();
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
@@ -107,9 +111,14 @@ public class MainActivity extends AppCompatActivity
             android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.main_content, fragment).commit();
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        closeNavigationDrawer();
         return true;
+    }
+
+    private void closeNavigationDrawer() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer != null) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
     }
 }

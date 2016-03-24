@@ -4,12 +4,14 @@ package com.studios.lucian.students.model;
  * Created with Love by Lucian and Pi on 03.03.2016.
  */
 public class Student {
-    private String _surname;
-    private String _name;
+    private String matricol;
+    private String groupNumber;
+    private String name;
+    private String surname;
 
     @Override
     public String toString() {
-        return _name + " " + _surname;
+        return name + " " + surname;
     }
 
     @Override
@@ -19,42 +21,61 @@ public class Student {
 
         Student student = (Student) o;
 
-        if (_surname != null ? !_surname.equals(student._surname) : student._surname != null)
+        if (matricol != null ? !matricol.equals(student.matricol) : student.matricol != null)
             return false;
-        return _name != null ? _name.equals(student._name) : student._name == null;
+        if (groupNumber != null ? !groupNumber.equals(student.groupNumber) : student.groupNumber != null)
+            return false;
+        if (surname != null ? !surname.equals(student.surname) : student.surname != null)
+            return false;
+        return name != null ? name.equals(student.name) : student.name == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = _surname != null ? _surname.hashCode() : 0;
-        result = 31 * result + (_name != null ? _name.hashCode() : 0);
+        int result = matricol != null ? matricol.hashCode() : 0;
+        result = 31 * result + (groupNumber != null ? groupNumber.hashCode() : 0);
+        result = 31 * result + (surname != null ? surname.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
 
-    public void set_surname(String _surname) {
-
-        this._surname = _surname;
+    public void setMatricol(String matricol) {
+        this.matricol = matricol;
     }
 
-    public void set_name(String _name) {
-        this._name = _name;
+    public void setGroupNumber(String groupNumber) {
+        this.groupNumber = groupNumber;
     }
 
-    public Student() {
-
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
-    public Student(String name, String surname) {
-        this._name = name;
-        this._surname = surname;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getMatricol() {
+        return matricol;
+    }
+
+    public String getGroupNumber() {
+        return groupNumber;
     }
 
     public String getSurname() {
-        return _surname;
+        return surname;
     }
 
     public String getName() {
-        return _name;
+        return name;
+    }
+
+    public Student(String groupNumber, String matricol, String name, String surname) {
+        this.matricol = matricol;
+        this.groupNumber = groupNumber;
+        this.name = name;
+        this.surname = surname;
     }
 }

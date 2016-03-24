@@ -1,14 +1,15 @@
 package com.studios.lucian.students.fragment;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,7 +24,7 @@ import android.widget.Toast;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.model.Student;
 import com.studios.lucian.students.util.Constants;
-import com.studios.lucian.students.util.ExcelParser;
+import com.studios.lucian.students.util.CsvParser;
 import com.studios.lucian.students.util.StudentsDBHandler;
 
 import java.io.File;
@@ -31,50 +32,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created with love by Lucian and @Pi on 25.01.2016.
+ * A simple {@link Fragment} subclass.
  */
-public class ExcelFragment extends android.support.v4.app.ListFragment implements AdapterView.OnItemClickListener {
+public class CsvFragment extends ListFragment implements AdapterView.OnItemClickListener {
 
-    private static final String TAG = ExcelFragment.class.getSimpleName();
+    private String TAG = CsvFragment.class.getSimpleName();
 
     private List<String> path = null;
-    private String fileExplorerRoot;
+    private String root;
     private TextView myPath;
     StudentsDBHandler studentsDBHandler;
 
-    public ExcelFragment() {
+    public CsvFragment() {
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate");
-        View rootView = inflater.inflate(R.layout.fragment_excel, container, false);
-
+        View rootView = inflater.inflate(R.layout.fragment_csv, container, false);
         studentsDBHandler = new StudentsDBHandler(getActivity());
         myPath = (TextView) rootView.findViewById(R.id.path);
-        fileExplorerRoot = Environment.getExternalStorageDirectory().getPath();
-        getDirectories(fileExplorerRoot);
+        root = Environment.getExternalStorageDirectory().getPath();
+        getDir(root);
         return rootView;
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         getListView().setOnItemClickListener(this);
     }
 
-    private void getDirectories(String dirPath) {
+    private void getDir(String dirPath) {
         myPath.setText(String.format("%s%s", getString(R.string.location), dirPath));
         List<String> item = new ArrayList<>();
         path = new ArrayList<>();
         File file = new File(dirPath);
         File[] files = file.listFiles();
 
-        if (!dirPath.equals(fileExplorerRoot)) {
-            item.add(fileExplorerRoot);
-            path.add(fileExplorerRoot);
+        if (!dirPath.equals(root)) {
+            item.add(root);
+            path.add(root);
             item.add("../");
             path.add(file.getParent());
         }
@@ -99,22 +97,22 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
 
         if (file.isDirectory()) {
             if (file.canRead()) {
-                getDirectories(path.get(position));
+                getDir(path.get(position));
             } else {
                 new AlertDialog.Builder(this.getActivity()).setTitle("[" + file.getName() + "] folder can't be read!").setPositiveButton("OK", null).show();
             }
         } else {
             String fileExtension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(Constants.DOT));
-            if (fileExtension.equals(Constants.XLS) || fileExtension.equals(Constants.XLSX)) {
-                handleXlsFile(file);
+            if (fileExtension.equals(Constants.CSV)) {
+                handleCsvFile(file);
             } else {
                 Toast.makeText(getContext(), Constants.FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG).show();
             }
         }
     }
 
-    private void handleXlsFile(File file) {
-        dialogBoxSelectionGroupNumber(file);
+    private void handleCsvFile(File file) {
+        selectGroupNumberDialogBox(file);
         redirectToMainFragment();
         setNavDrawerItemAsChecked();
     }
@@ -132,7 +130,7 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
         fragmentTransaction.commit();
     }
 
-    private void dialogBoxSelectionGroupNumber(final File fileName) {
+    private void selectGroupNumberDialogBox(final File fileName) {
         android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(getContext());
 
         dialogBuilder.setTitle(Constants.DIALOG_TITLE);
@@ -147,7 +145,6 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String groupNumber = input.getText().toString();
-
                 insertRecords(groupNumber, fileName);
             }
         });
@@ -162,8 +159,8 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
     }
 
     private void insertRecords(String groupNumber, File fileName) {
-        ExcelParser excelParser = new ExcelParser(groupNumber);
-        List<Student> studentList = excelParser.getStudentsList(fileName.getAbsolutePath());
+        CsvParser csvParser = new CsvParser(fileName);
+        List<Student> studentList = csvParser.getStudentsList(groupNumber);
         storeInDataBase(studentList);
     }
 

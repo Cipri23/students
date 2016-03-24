@@ -22,7 +22,9 @@ public class StudentsDBHandler {
 
     public void insertStudents(List<Student> studentsList) {
         for (Student student : studentsList) {
-            studentDAO.add(student);
+            if (!studentDAO.find(student)) {
+                studentDAO.add(student);
+            }
         }
     }
 
