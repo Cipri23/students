@@ -24,26 +24,34 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private Toolbar mToolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // Setup the toolbar
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        // Setup the drawer layout
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        // mDrawerLayout.setStatusBarBackground(R.color.colorGreen);
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
-        toggle.syncState();
-        setupMainFragment(savedInstanceState);
+        mDrawerToggle.syncState();
+        setupMainFragment(savedInstanceState);  // show the MainFragment as the default fragment for start
     }
 
     private void setupMainFragment(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.main_content, new MainFragment()).commit();
+            setTitle(getString(R.string.dashboard));
         }
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView != null) {
@@ -55,10 +63,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         Log.v(TAG, "onBackPressed");
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer != null) {
-            if (drawer.isDrawerOpen(GravityCompat.START)) {
-                drawer.closeDrawer(GravityCompat.START);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (mDrawerLayout != null) {
+            if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+                mDrawerLayout.closeDrawer(GravityCompat.START);
             } else {
                 super.onBackPressed();
             }
@@ -111,14 +119,15 @@ public class MainActivity extends AppCompatActivity
             android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.main_content, fragment).commit();
         }
+        setTitle(item.getTitle());
         closeNavigationDrawer();
         return true;
     }
 
     private void closeNavigationDrawer() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer != null) {
-            drawer.closeDrawer(GravityCompat.START);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (mDrawerLayout != null) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
         }
     }
 }

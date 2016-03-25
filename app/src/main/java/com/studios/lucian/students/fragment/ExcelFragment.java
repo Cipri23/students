@@ -1,7 +1,6 @@
 package com.studios.lucian.students.fragment;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,10 +36,11 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
 
     private static final String TAG = ExcelFragment.class.getSimpleName();
 
-    private List<String> path = null;
-    private String fileExplorerRoot;
-    private TextView myPath;
-    StudentsDBHandler studentsDBHandler;
+    private String mGroupNumber;
+    private List<String> mPath;
+    private String mFileExplorerRoot;
+    private TextView mTextViewPath;
+    StudentsDBHandler mStudentsDBHandler;
 
     public ExcelFragment() {
     }
@@ -51,10 +51,10 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
         Log.d(TAG, "onCreate");
         View rootView = inflater.inflate(R.layout.fragment_excel, container, false);
 
-        studentsDBHandler = new StudentsDBHandler(getActivity());
-        myPath = (TextView) rootView.findViewById(R.id.path);
-        fileExplorerRoot = Environment.getExternalStorageDirectory().getPath();
-        getDirectories(fileExplorerRoot);
+        mStudentsDBHandler = new StudentsDBHandler(getActivity());
+        mTextViewPath = (TextView) rootView.findViewById(R.id.path);
+        mFileExplorerRoot = Environment.getExternalStorageDirectory().getPath();
+        getDirectories(mFileExplorerRoot);
         return rootView;
     }
 
@@ -66,22 +66,22 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
     }
 
     private void getDirectories(String dirPath) {
-        myPath.setText(String.format("%s%s", getString(R.string.location), dirPath));
+        mTextViewPath.setText(String.format("%s%s", getString(R.string.location), dirPath));
         List<String> item = new ArrayList<>();
-        path = new ArrayList<>();
+        mPath = new ArrayList<>();
         File file = new File(dirPath);
         File[] files = file.listFiles();
 
-        if (!dirPath.equals(fileExplorerRoot)) {
-            item.add(fileExplorerRoot);
-            path.add(fileExplorerRoot);
+        if (!dirPath.equals(mFileExplorerRoot)) {
+            item.add(mFileExplorerRoot);
+            mPath.add(mFileExplorerRoot);
             item.add("../");
-            path.add(file.getParent());
+            mPath.add(file.getParent());
         }
 
         for (File file1 : files) {
             if (!file1.isHidden() && file1.canRead()) {
-                path.add(file1.getPath());
+                mPath.add(file1.getPath());
                 if (file1.isDirectory()) {
                     item.add(file1.getName() + "/");
                 } else {
@@ -95,11 +95,11 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        File file = new File(path.get(position));
+        File file = new File(mPath.get(position));
 
         if (file.isDirectory()) {
             if (file.canRead()) {
-                getDirectories(path.get(position));
+                getDirectories(mPath.get(position));
             } else {
                 new AlertDialog.Builder(this.getActivity()).setTitle("[" + file.getName() + "] folder can't be read!").setPositiveButton("OK", null).show();
             }
@@ -114,25 +114,22 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
     }
 
     private void handleXlsFile(File file) {
-        dialogBoxSelectionGroupNumber(file);
-        redirectToMainFragment();
+        dialogBoxSelectionGroupNumber();
+        insertRecords(mGroupNumber, file);
+        redirectToMainFragment(mGroupNumber);
         setNavDrawerItemAsChecked();
     }
 
-    private void setNavDrawerItemAsChecked() {
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().getItem(0).setChecked(true);
-    }
-
-    private void redirectToMainFragment() {
+    private void redirectToMainFragment(String groupNumber) {
         MainFragment mainFragment = new MainFragment();
+        mainFragment.addNewTab(groupNumber);
         android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.main_content, mainFragment);
         fragmentTransaction.commit();
     }
 
-    private void dialogBoxSelectionGroupNumber(final File fileName) {
+    private void dialogBoxSelectionGroupNumber() {
         android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(getContext());
 
         dialogBuilder.setTitle(Constants.DIALOG_TITLE);
@@ -146,9 +143,8 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
         dialogBuilder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                String groupNumber = input.getText().toString();
+                mGroupNumber = input.getText().toString();
 
-                insertRecords(groupNumber, fileName);
             }
         });
         dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -172,9 +168,14 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
             @SafeVarargs
             @Override
             protected final Void doInBackground(List<Student>... lists) {
-                studentsDBHandler.insertStudents(lists[0]);
+                mStudentsDBHandler.insertStudents(lists[0]);
                 return null;
             }
         }.execute(studentList);
+    }
+
+    private void setNavDrawerItemAsChecked() {
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        navigationView.getMenu().getItem(0).setChecked(true);
     }
 }

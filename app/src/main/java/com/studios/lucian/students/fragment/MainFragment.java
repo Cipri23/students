@@ -4,18 +4,17 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.adapter.PageAdapter;
-import com.studios.lucian.students.model.Student;
-import com.studios.lucian.students.util.StudentsDBHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,10 +24,15 @@ public class MainFragment extends Fragment {
 
     private static final String TAG = MainFragment.class.getSimpleName();
 
-    ViewPager viewPager;
-    TabLayout tabLayout;
+    private ViewPager mViewPager;
+    private TabLayout mTabLayout;
+    private int mTabsNumber;
+
+    private List<GroupTabFragment> fragments;
+    PageAdapter adapter;
 
     public MainFragment() {
+
     }
 
     @Nullable
@@ -38,15 +42,27 @@ public class MainFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        viewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
-        tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout);
+        mViewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
+        mTabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout);
 
-        PageAdapter adapter = new PageAdapter(getFragmentManager());
-        viewPager.setAdapter(adapter);
+        fragments = new ArrayList<>();
+        fragments.add(new GroupTabFragment());
+        fragments.add(new GroupTabFragment());
 
-        tabLayout.setupWithViewPager(viewPager);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        adapter = new PageAdapter(getFragmentManager(), fragments);
 
+//        mTabLayout.addTab(mTabLayout.newTab().setText("Pi"));
+//        mTabLayout.addTab(mTabLayout.newTab().setText("Pirelli"));
+//        mTabsNumber = 2;
+
+        mViewPager.setAdapter(adapter);
+        mTabLayout.setupWithViewPager(mViewPager);
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         return rootView;
+    }
+
+    public void addNewTab(String groupNumber) {
+        fragments.add(new GroupTabFragment());      // nullPointerEx here
+        adapter.notifyDataSetChanged();
     }
 }

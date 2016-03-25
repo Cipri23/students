@@ -38,10 +38,11 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
 
     private String TAG = CsvFragment.class.getSimpleName();
 
-    private List<String> path = null;
-    private String root;
-    private TextView myPath;
-    StudentsDBHandler studentsDBHandler;
+    private String mGroupNumber;
+    private List<String> mPath;
+    private String mFileExplorerRoot;
+    private TextView mTextViewPath;
+    StudentsDBHandler mStudentsDBHandler;
 
     public CsvFragment() {
     }
@@ -49,10 +50,10 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_csv, container, false);
-        studentsDBHandler = new StudentsDBHandler(getActivity());
-        myPath = (TextView) rootView.findViewById(R.id.path);
-        root = Environment.getExternalStorageDirectory().getPath();
-        getDir(root);
+        mStudentsDBHandler = new StudentsDBHandler(getActivity());
+        mTextViewPath = (TextView) rootView.findViewById(R.id.path);
+        mFileExplorerRoot = Environment.getExternalStorageDirectory().getPath();
+        getDir(mFileExplorerRoot);
         return rootView;
     }
 
@@ -64,22 +65,22 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
     }
 
     private void getDir(String dirPath) {
-        myPath.setText(String.format("%s%s", getString(R.string.location), dirPath));
+        mTextViewPath.setText(String.format("%s%s", getString(R.string.location), dirPath));
         List<String> item = new ArrayList<>();
-        path = new ArrayList<>();
+        mPath = new ArrayList<>();
         File file = new File(dirPath);
         File[] files = file.listFiles();
 
-        if (!dirPath.equals(root)) {
-            item.add(root);
-            path.add(root);
+        if (!dirPath.equals(mFileExplorerRoot)) {
+            item.add(mFileExplorerRoot);
+            mPath.add(mFileExplorerRoot);
             item.add("../");
-            path.add(file.getParent());
+            mPath.add(file.getParent());
         }
 
         for (File file1 : files) {
             if (!file1.isHidden() && file1.canRead()) {
-                path.add(file1.getPath());
+                mPath.add(file1.getPath());
                 if (file1.isDirectory()) {
                     item.add(file1.getName() + "/");
                 } else {
@@ -93,11 +94,10 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        File file = new File(path.get(position));
-
+        File file = new File(mPath.get(position));
         if (file.isDirectory()) {
             if (file.canRead()) {
-                getDir(path.get(position));
+                getDir(mPath.get(position));
             } else {
                 new AlertDialog.Builder(this.getActivity()).setTitle("[" + file.getName() + "] folder can't be read!").setPositiveButton("OK", null).show();
             }
@@ -112,7 +112,8 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
     }
 
     private void handleCsvFile(File file) {
-        selectGroupNumberDialogBox(file);
+        selectGroupNumberDialogBox();
+        insertRecords(mGroupNumber, file);
         redirectToMainFragment();
         setNavDrawerItemAsChecked();
     }
@@ -130,7 +131,7 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
         fragmentTransaction.commit();
     }
 
-    private void selectGroupNumberDialogBox(final File fileName) {
+    private void selectGroupNumberDialogBox() {
         android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(getContext());
 
         dialogBuilder.setTitle(Constants.DIALOG_TITLE);
@@ -144,8 +145,7 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
         dialogBuilder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                String groupNumber = input.getText().toString();
-                insertRecords(groupNumber, fileName);
+                mGroupNumber = input.getText().toString();
             }
         });
         dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -169,7 +169,7 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
             @SafeVarargs
             @Override
             protected final Void doInBackground(List<Student>... lists) {
-                studentsDBHandler.insertStudents(lists[0]);
+                mStudentsDBHandler.insertStudents(lists[0]);
                 return null;
             }
         }.execute(studentList);

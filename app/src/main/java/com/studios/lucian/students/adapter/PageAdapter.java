@@ -3,9 +3,9 @@ package com.studios.lucian.students.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 
 import com.studios.lucian.students.fragment.GroupTabFragment;
-import com.studios.lucian.students.fragment.MovieFragment;
 
 import java.util.List;
 
@@ -14,45 +14,26 @@ import java.util.List;
  */
 public class PageAdapter extends FragmentStatePagerAdapter {
 
-    private int numTabs = 0;
+    private List<GroupTabFragment> mData;
 
-    private List<Fragment> groupsFragments;
-    public PageAdapter(FragmentManager fm) {
+    public PageAdapter(FragmentManager fm, List<GroupTabFragment> data) {
         super(fm);
+        mData = data;
     }
 
     @Override
-    public Fragment getItem(int position) {
-        Fragment fragment = null;
-        //return new GroupTabFragment(position);
-        switch (position) {
-            case 0:
-                fragment = new GroupTabFragment();
-                break;
-            case 1:
-                fragment = new MovieFragment();
-                break;
-        }
-        return fragment;
-        // return new GroupTabFragment(position);
+    public Fragment getItem(int position){
+        return mData.get(position);
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        String title = "";
-        switch (position) {
-            case 0:
-                title = "Game";
-                break;
-            case 1:
-                title = "Movie";
-                break;
-        }
-        return title;
+        return "Pirelli"; // text should be returned by position
     }
 
     @Override
     public int getCount() {
-        return 2;
+        Log.v("ADAPTER", "getCount" + mData.size());
+        return mData.size();
     }
 }

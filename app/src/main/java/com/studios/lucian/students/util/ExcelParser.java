@@ -6,10 +6,8 @@ import com.studios.lucian.students.model.Student;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import jxl.Cell;
@@ -24,22 +22,24 @@ public class ExcelParser {
 
     private final static String TAG = ExcelParser.class.getSimpleName();
 
-    private String groupNumber;
-    private List<Student> studentsList;
+    private static final int mSkipRows = 8;
+    private String mGroupNumber;
+    private List<Student> mStudentsList;
 
     public ExcelParser(String number) {
-        studentsList = new ArrayList<>();
-        this.groupNumber = number;
+        Log.v(TAG, "ExcelParser");
+        mStudentsList = new ArrayList<>();
+        mGroupNumber = number;
     }
 
     public void parseFile(String absolutePath) {
+        Log.v(TAG, "parseFile");
         try {
             File file = new File(absolutePath);
             FileInputStream fileInputStream = new FileInputStream(file);
             Workbook workbook = Workbook.getWorkbook(fileInputStream);
             Sheet sheet = workbook.getSheet(0);
-
-            for (int i = 8; i < sheet.getRows(); i++) {
+            for (int i = mSkipRows; i < sheet.getRows(); i++) {
                 parseRow(sheet.getRow(i));
             }
         } catch (IOException | BiffException e) {
@@ -48,15 +48,14 @@ public class ExcelParser {
     }
 
     private void parseRow(Cell[] row) {
-        studentsList.add(new Student(groupNumber, row[1].getContents(), row[2].getContents(), row[4].getContents()));
-    }
-
-    public List<Student> getStudentsList() {
-        return studentsList;
+        Log.v(TAG, "parseRow");
+        Student student = new Student(mGroupNumber, row[1].getContents(), row[2].getContents(), row[4].getContents());
+        mStudentsList.add(student);
     }
 
     public List<Student> getStudentsList(String absolutePath) {
+        Log.v(TAG, "getStudentsList");
         parseFile(absolutePath);
-        return studentsList;
+        return mStudentsList;
     }
 }

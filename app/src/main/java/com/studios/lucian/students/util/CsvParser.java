@@ -17,21 +17,24 @@ import java.util.List;
  */
 public class CsvParser {
 
-    private File file;
+    private File mFile;
     private static String TAG = CsvParser.class.getSimpleName();
 
-    public CsvParser(File filePath) {
-        this.file = filePath;
+    public CsvParser(File filePath)
+    {
+        Log.v(TAG, "CsvParser");
+        mFile = filePath;
     }
 
     public List<Student> getStudentsList(String groupNumber) {
+        Log.v(TAG, "getStudentsList");
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         String line;
         List<Student> studentList = new ArrayList<>();
 
         try {
-            fileReader = new FileReader(file);
+            fileReader = new FileReader(mFile);
             bufferedReader = new BufferedReader(fileReader);
             while ((line = bufferedReader.readLine()) != null) {
                 studentList.add(getStudentFromLine(groupNumber, line));
@@ -58,6 +61,7 @@ public class CsvParser {
     }
 
     private Student getStudentFromLine(String groupNumber, String line) {
+        Log.v(TAG, "getStudentFromLine");
         String[] components = line.split(Constants.CSV_DEFAULT_SEPARATOR);
         return new Student(groupNumber, components[0], components[1], components[2]);
     }

@@ -12,29 +12,29 @@ import java.util.List;
  */
 public class StudentsDBHandler {
 
-    private StudentDAO studentDAO;
-    private List<Student> studentList;
+    private StudentDAO mStudentDAO;
+    private List<Student> mStudentList;
 
     public StudentsDBHandler(Context context) {
-        studentDAO = new StudentDAO(context);
-        studentList = studentDAO.getAll();
+        mStudentDAO = new StudentDAO(context);
+        mStudentList = mStudentDAO.getAll();
     }
 
     public void insertStudents(List<Student> studentsList) {
         for (Student student : studentsList) {
-            if (!studentDAO.find(student)) {
-                studentDAO.add(student);
+            if (!mStudentDAO.find(student)) {
+                mStudentDAO.add(student);
             }
         }
     }
 
     public List<Student> getAll() {
-        return studentList;
+        return mStudentList;
     }
 
     public void clearStudents() {
-        for (Student student : studentList) {
-            studentDAO.delete(student);
+        for (Student student : mStudentList) {
+            mStudentDAO.delete(student);
         }
     }
 }
