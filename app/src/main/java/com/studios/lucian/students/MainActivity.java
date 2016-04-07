@@ -1,10 +1,8 @@
 package com.studios.lucian.students;
 
+import android.app.Fragment;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.studios.lucian.students.fragment.CsvFragment;
 import com.studios.lucian.students.fragment.ExcelFragment;
@@ -21,12 +18,13 @@ import com.studios.lucian.students.fragment.MainFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private Toolbar mToolbar;
+    private NavigationView mNavigationView;
+    private MainFragment mMainFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,23 +38,26 @@ public class MainActivity extends AppCompatActivity
 
         // Setup the drawer layout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        // mDrawerLayout.setStatusBarBackground(R.color.colorGreen);
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
         mDrawerToggle.syncState();
-        setupMainFragment(savedInstanceState);  // show the MainFragment as the default fragment for start
+        setupMainFragment(savedInstanceState);
+    }
+
+    public MainFragment getMainFragment() {
+        return mMainFragment;
     }
 
     private void setupMainFragment(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_content, new MainFragment()).commit();
+            mMainFragment = new MainFragment();
+            getFragmentManager().beginTransaction().replace(R.id.main_content, mMainFragment, "MF").commit();
             setTitle(getString(R.string.dashboard));
         }
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView != null) {
-            navigationView.getMenu().getItem(0).setChecked(true);
-            navigationView.setNavigationItemSelectedListener(this);
+        if (mNavigationView != null) {
+            mNavigationView.getMenu().getItem(0).setChecked(true);
+            mNavigationView.setNavigationItemSelectedListener(this);
         }
     }
 
@@ -68,9 +69,32 @@ public class MainActivity extends AppCompatActivity
             if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
                 mDrawerLayout.closeDrawer(GravityCompat.START);
             } else {
-                super.onBackPressed();
+                if (getFragmentManager().getBackStackEntryCount() == 0) {
+                    Log.v(TAG, "if backStackCount = " + getFragmentManager().getBackStackEntryCount());
+                    super.onBackPressed();
+                } else {
+                    Log.v(TAG, "else backStackCount = " + getFragmentManager().getBackStackEntryCount());
+                    returnToMainFragmentFromBackStack();
+                }
             }
         }
+    }
+
+    private void returnToMainFragmentFromBackStack() {
+        Log.v(TAG, "returnToMF");
+        CsvFragment csvFragment = (CsvFragment) getFragmentManager().findFragmentByTag("CSVF");
+        ExcelFragment excelFragment = (ExcelFragment) getFragmentManager().findFragmentByTag("EF");
+
+        if (csvFragment != null && csvFragment.isVisible()) {
+            getFragmentManager().beginTransaction().remove(csvFragment).commit();
+        }
+        if (excelFragment != null && excelFragment.isVisible()) {
+            getFragmentManager().beginTransaction().remove(excelFragment).commit();
+        }
+        // todo: handle if main fragment is visible and back stack count is > 0
+        getFragmentManager().popBackStack();
+        setTitle(R.string.dashboard);
+        mNavigationView.getMenu().getItem(0).setChecked(true);
     }
 
     @Override
@@ -82,7 +106,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.v(TAG, "onOptionsItemSelected");
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -97,16 +120,43 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        Log.v(TAG, "onNavigationItemSelected");
         Fragment fragment = null;
         int id = item.getItemId();
 
+        Log.v(TAG, "onNavItemSelected");
+
         if (id == R.id.nav_home) {
-            fragment = new MainFragment();
+            if (getFragmentManager().getBackStackEntryCount() > 0) {
+                returnToMainFragmentFromBackStack();
+            }
         } else if (id == R.id.nav_excel_file) {
-            fragment = new ExcelFragment();
+            MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentByTag("MF");
+            if (mainFragment != null && mainFragment.isVisible()) {
+                getFragmentManager().
+                        beginTransaction().
+                        replace(R.id.main_content, new ExcelFragment(), "EF").
+                        addToBackStack(null).
+                        commit();
+            } else {
+                getFragmentManager().
+                        beginTransaction().
+                        replace(R.id.main_content, new ExcelFragment(), "EF").
+                        commit();
+            }
         } else if (id == R.id.nav_csv_file) {
-            fragment = new CsvFragment();
+            MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentByTag("MF");
+            if (mainFragment != null && mainFragment.isVisible()) {
+                getFragmentManager().
+                        beginTransaction().
+                        replace(R.id.main_content, new CsvFragment(), "CSVF").
+                        addToBackStack(null).
+                        commit();
+            } else {
+                getFragmentManager().
+                        beginTransaction().
+                        replace(R.id.main_content, new CsvFragment(), "CSVF").
+                        commit();
+            }
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
@@ -115,10 +165,8 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-        if (fragment != null) {
-            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.main_content, fragment).commit();
-        }
+
+//        mToolbar.setSubtitle();
         setTitle(item.getTitle());
         closeNavigationDrawer();
         return true;

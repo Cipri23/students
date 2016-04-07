@@ -16,18 +16,18 @@ import java.util.List;
  * Created with Love by Lucian and Pi on 22.03.2016.
  */
 public class CsvParser {
+    private static String TAG = CsvParser.class.getSimpleName();
+    public static String CSV_DEFAULT_SEPARATOR = ";";
 
     private File mFile;
-    private static String TAG = CsvParser.class.getSimpleName();
+    private String mGroupNumber;
 
-    public CsvParser(File filePath)
-    {
-        Log.v(TAG, "CsvParser");
+    public CsvParser(String groupNumber, File filePath) {
+        mGroupNumber = groupNumber;
         mFile = filePath;
     }
 
-    public List<Student> getStudentsList(String groupNumber) {
-        Log.v(TAG, "getStudentsList");
+    public List<Student> parseFile() {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         String line;
@@ -37,7 +37,8 @@ public class CsvParser {
             fileReader = new FileReader(mFile);
             bufferedReader = new BufferedReader(fileReader);
             while ((line = bufferedReader.readLine()) != null) {
-                studentList.add(getStudentFromLine(groupNumber, line));
+                String[] components = line.split(CSV_DEFAULT_SEPARATOR);
+                studentList.add(new Student(mGroupNumber, components[0], components[1], components[2]));
             }
         } catch (FileNotFoundException e) {
             Log.v(TAG, e.getMessage());
@@ -58,11 +59,5 @@ public class CsvParser {
             }
         }
         return studentList;
-    }
-
-    private Student getStudentFromLine(String groupNumber, String line) {
-        Log.v(TAG, "getStudentFromLine");
-        String[] components = line.split(Constants.CSV_DEFAULT_SEPARATOR);
-        return new Student(groupNumber, components[0], components[1], components[2]);
     }
 }

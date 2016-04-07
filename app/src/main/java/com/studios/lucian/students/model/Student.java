@@ -9,6 +9,13 @@ public class Student {
     private String name;
     private String surname;
 
+    public Student(String groupNumber, String matricol, String name, String surname) {
+        this.matricol = matricol;
+        this.groupNumber = groupNumber;
+        this.name = name;
+        this.surname = surname;
+    }
+
     @Override
     public String toString() {
         return name + " " + surname;
@@ -21,13 +28,7 @@ public class Student {
 
         Student student = (Student) o;
 
-        if (matricol != null ? !matricol.equals(student.matricol) : student.matricol != null)
-            return false;
-        if (groupNumber != null ? !groupNumber.equals(student.groupNumber) : student.groupNumber != null)
-            return false;
-        if (surname != null ? !surname.equals(student.surname) : student.surname != null)
-            return false;
-        return name != null ? name.equals(student.name) : student.name == null;
+        return matricol != null ? matricol.equals(student.matricol) : student.matricol == null && (groupNumber != null ? groupNumber.equals(student.groupNumber) : student.groupNumber == null && (surname != null ? surname.equals(student.surname) : student.surname == null && (name != null ? name.equals(student.name) : student.name == null)));
 
     }
 
@@ -72,10 +73,7 @@ public class Student {
         return name;
     }
 
-    public Student(String groupNumber, String matricol, String name, String surname) {
-        this.matricol = matricol;
-        this.groupNumber = groupNumber;
-        this.name = name;
-        this.surname = surname;
+    public String getDisplayedMatricol() {
+        return "Matricol:\n" + matricol;
     }
 }

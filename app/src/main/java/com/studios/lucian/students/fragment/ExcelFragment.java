@@ -1,13 +1,12 @@
 package com.studios.lucian.students.fragment;
 
-import android.app.AlertDialog;
+import android.app.ListFragment;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +18,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.studios.lucian.students.MainActivity;
 import com.studios.lucian.students.R;
+import com.studios.lucian.students.model.Group;
 import com.studios.lucian.students.model.Student;
 import com.studios.lucian.students.util.Constants;
 import com.studios.lucian.students.util.ExcelParser;
@@ -32,37 +33,43 @@ import java.util.List;
 /**
  * Created with love by Lucian and @Pi on 25.01.2016.
  */
-public class ExcelFragment extends android.support.v4.app.ListFragment implements AdapterView.OnItemClickListener {
-
+public class ExcelFragment extends ListFragment implements AdapterView.OnItemClickListener {
     private static final String TAG = ExcelFragment.class.getSimpleName();
+    private static final int POSITION_MAIN_FRAGMENT = 0;
+    private static String DOT = ".";
+    public static String XLS = ".xls";
+    public static String XLSX = ".xlsx";
 
     private String mGroupNumber;
-    private List<String> mPath;
     private String mFileExplorerRoot;
+    private List<String> mPath;
     private TextView mTextViewPath;
-    StudentsDBHandler mStudentsDBHandler;
+    private StudentsDBHandler mStudentsDBHandler;
 
     public ExcelFragment() {
+        mFileExplorerRoot = Environment.getExternalStorageDirectory().getPath();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
-        View rootView = inflater.inflate(R.layout.fragment_excel, container, false);
+        return inflater.inflate(R.layout.fragment_excel, container, false);
+    }
 
-        mStudentsDBHandler = new StudentsDBHandler(getActivity());
-        mTextViewPath = (TextView) rootView.findViewById(R.id.path);
-        mFileExplorerRoot = Environment.getExternalStorageDirectory().getPath();
-        getDirectories(mFileExplorerRoot);
-        return rootView;
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mTextViewPath = (TextView) view.findViewById(R.id.path);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
+        mStudentsDBHandler = new StudentsDBHandler(getActivity());
         getListView().setOnItemClickListener(this);
+        getDirectories(mFileExplorerRoot);
     }
 
     private void getDirectories(String dirPath) {
@@ -78,7 +85,6 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
             item.add("../");
             mPath.add(file.getParent());
         }
-
         for (File file1 : files) {
             if (!file1.isHidden() && file1.canRead()) {
                 mPath.add(file1.getPath());
@@ -104,32 +110,16 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
                 new AlertDialog.Builder(this.getActivity()).setTitle("[" + file.getName() + "] folder can't be read!").setPositiveButton("OK", null).show();
             }
         } else {
-            String fileExtension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(Constants.DOT));
-            if (fileExtension.equals(Constants.XLS) || fileExtension.equals(Constants.XLSX)) {
-                handleXlsFile(file);
+            String fileExtension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(DOT));
+            if (fileExtension.equals(XLS) || fileExtension.equals(XLSX)) {
+                dialogBoxSelectionGroupNumber(file);
             } else {
                 Toast.makeText(getContext(), Constants.FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG).show();
             }
         }
     }
 
-    private void handleXlsFile(File file) {
-        dialogBoxSelectionGroupNumber();
-        insertRecords(mGroupNumber, file);
-        redirectToMainFragment(mGroupNumber);
-        setNavDrawerItemAsChecked();
-    }
-
-    private void redirectToMainFragment(String groupNumber) {
-        MainFragment mainFragment = new MainFragment();
-        mainFragment.addNewTab(groupNumber);
-        android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.main_content, mainFragment);
-        fragmentTransaction.commit();
-    }
-
-    private void dialogBoxSelectionGroupNumber() {
+    private void dialogBoxSelectionGroupNumber(final File file) {
         android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(getContext());
 
         dialogBuilder.setTitle(Constants.DIALOG_TITLE);
@@ -144,7 +134,7 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 mGroupNumber = input.getText().toString();
-
+                handleXlsFile(file);
             }
         });
         dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -157,25 +147,29 @@ public class ExcelFragment extends android.support.v4.app.ListFragment implement
         dialog.show();
     }
 
-    private void insertRecords(String groupNumber, File fileName) {
-        ExcelParser excelParser = new ExcelParser(groupNumber);
-        List<Student> studentList = excelParser.getStudentsList(fileName.getAbsolutePath());
-        storeInDataBase(studentList);
+    private void handleXlsFile(File file) {
+        int studentsCount = insertRecords(file);
+        Group group = new Group(mGroupNumber, studentsCount);
+        redirectToMainFragment(group);
+        setNavDrawerItemAsChecked();
     }
 
-    private void storeInDataBase(List<Student> studentList) {
-        new AsyncTask<List<Student>, Void, Void>() {
-            @SafeVarargs
-            @Override
-            protected final Void doInBackground(List<Student>... lists) {
-                mStudentsDBHandler.insertStudents(lists[0]);
-                return null;
-            }
-        }.execute(studentList);
+    private void redirectToMainFragment(Group group) {
+        MainFragment mainFragment = ((MainActivity) getActivity()).getMainFragment();
+        mainFragment.addNewGroup(group);
+    //    getChildFragmentManager().popBackStack();
+        getFragmentManager().beginTransaction().replace(R.id.main_content, mainFragment).commit();
+    }
+
+    private int insertRecords(File fileName) {
+        ExcelParser excelParser = new ExcelParser(mGroupNumber, fileName.getAbsolutePath());
+        List<Student> studentList = excelParser.parseFile();
+        mStudentsDBHandler.insertStudents(studentList);
+        return studentList.size();
     }
 
     private void setNavDrawerItemAsChecked() {
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        navigationView.getMenu().getItem(0).setChecked(true);
+        navigationView.getMenu().getItem(POSITION_MAIN_FRAGMENT).setChecked(true);
     }
 }

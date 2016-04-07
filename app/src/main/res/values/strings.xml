@@ -10,19 +10,35 @@
     <string name="dashboard">Dashboard</string>
     <string name="location">"Location: "</string>
 
-    <string-array name="Planets">
-        <item>Sun</item>
-        <item>Mercury</item>
-        <item>Venus</item>
-        <item>Earth</item>
-        <item>Mars</item>
-        <item>Jupiter</item>
-        <item>Saturn</item>
-        <item>Uranus</item>
-        <item>Neptune</item>
-    </string-array>
-
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="students_from_csv">Students from CSV</string>
+
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="button_add_student">Add</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="dialog_add_student_title">ADD STUDENT</string>
+    <string name="dialog_group_number">Group Number:</string>
+    <string name="matricol">Student ID</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="student_added">The student was added</string>
+    <string name="error_add_student_title">Error adding student.</string>
+    <string name="error_add_student_message">Please check again the inputs</string>
+    <string name="OK">OK</string>
+    <string name="student_id_duplicated_title">Student ID found in database</string>
+    <string name="student_id_duplicated_message">It seems like there already exists a student with the same ID. Student was not added.</string>
+    <string name="file_parsed">The file was parsed.</string>
+    <string name="no_data">No records found.\n\nYou can select files in the left menu.</string>
+    <string name="student_menu_edit">Edit student</string>
+    <string name="student_menu_delete">Delete student</string>
+    <string name="student_not_found">The selected student was not found.</string>
+    <string name="button_update_student">UPDATE</string>
+    <string name="error_update_student_title">Error updating student.</string>
+    <string name="error_update_student_message">Please check again the inputs</string>
+    <string name="error_update_student">An error occurred</string>
+    <string name="add_note">+Note</string>
+    <string name="student_list_button_1">+GRADE</string>
+    <string name="student_list_button_2">SOME ACTION</string>
 
 </resources>
