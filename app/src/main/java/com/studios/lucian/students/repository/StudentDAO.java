@@ -18,12 +18,10 @@ import java.util.List;
 /**
  * Created with Love by Lucian and Pi on 03.03.2016.
  */
-public class StudentDAO extends SQLiteOpenHelper {
+public class StudentDAO extends DataBaseHelper {
     private static final String TAG = StudentDAO.class.getSimpleName();
     private static final int ERROR_CODE = -1;
-    private static final int DATABASE_VERSION = 1;
 
-    private static final String DATABASE_NAME = "StudentManagement.db";
     private static final String TABLE_NAME_STUDENT = "student";
     private static final String COLUMN_NAME_STUDENT_ID = "studentid";
     private static final String COLUMN_NAME_GROUP_NUMBER = "groupnumber";
@@ -32,26 +30,7 @@ public class StudentDAO extends SQLiteOpenHelper {
     private static final String COLUMN_NAME_SURNAME = "surname";
 
     public StudentDAO(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        String query = "CREATE TABLE " + TABLE_NAME_STUDENT + " (" +
-                COLUMN_NAME_STUDENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_NAME_GROUP_NUMBER + " TEXT," +
-                COLUMN_NAME_MATRICOL + " TEXT," +
-                COLUMN_NAME_NAME + " TEXT," +
-                COLUMN_NAME_SURNAME + " TEXT" + ");";
-        sqLiteDatabase.execSQL(query);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        String query = "DROP TABLE IF EXISTS " + TABLE_NAME_STUDENT;
-        sqLiteDatabase.execSQL(query);
-        onCreate(sqLiteDatabase);
-
+        super(context);
     }
 
     public void add(Student student) {

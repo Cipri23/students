@@ -1,4 +1,4 @@
-package com.studios.lucian.students.util;
+package com.studios.lucian.students.util.parser;
 
 import android.util.Log;
 
@@ -11,7 +11,6 @@ import com.studios.lucian.students.model.Student;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 

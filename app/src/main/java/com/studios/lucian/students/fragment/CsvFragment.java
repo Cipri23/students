@@ -1,12 +1,12 @@
 package com.studios.lucian.students.fragment;
 
 import android.app.ListFragment;
-import android.support.v7.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,9 +22,8 @@ import com.studios.lucian.students.MainActivity;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.model.Group;
 import com.studios.lucian.students.model.Student;
-import com.studios.lucian.students.util.Constants;
-import com.studios.lucian.students.util.CsvParser;
-import com.studios.lucian.students.util.StudentsDBHandler;
+import com.studios.lucian.students.util.StudentsDbHandler;
+import com.studios.lucian.students.util.parser.CsvParser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,14 +33,16 @@ import java.util.List;
  * A simple {@link } subclass.
  */
 public class CsvFragment extends ListFragment implements AdapterView.OnItemClickListener {
-    private String TAG = CsvFragment.class.getSimpleName();
-    private static String DOT = ".";
+    public static String FORMAT_NOT_SUPPORTED = "The selected file doesn't have the proper format.";
+    public static String DIALOG_MESSAGE = "Please specify the group number for this file";
+    public static String DIALOG_TITLE = "Group Number";
     public static String CSV = ".csv";
-
+    private static String DOT = ".";
+    private String TAG = CsvFragment.class.getSimpleName();
     private String mGroupNumber;
     private String mFileExplorerRoot;
     private List<String> mPath;
-    private StudentsDBHandler mStudentsDBHandler;
+    private StudentsDbHandler mStudentsDbHandler;
 
     private TextView mTextViewPath;
 
@@ -64,7 +65,7 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-        mStudentsDBHandler = new StudentsDBHandler(getActivity());
+        mStudentsDbHandler = new StudentsDbHandler(getActivity());
         getListView().setOnItemClickListener(this);
         getDirectories(mFileExplorerRoot);
     }
@@ -111,7 +112,7 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
             if (fileExtension.equals(CSV)) {
                 selectGroupNumberDialogBox(file);
             } else {
-                Toast.makeText(getContext(), Constants.FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -119,8 +120,8 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
     private void selectGroupNumberDialogBox(final File file) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
 
-        dialogBuilder.setTitle(Constants.DIALOG_TITLE);
-        dialogBuilder.setMessage(Constants.DIALOG_MESSAGE);
+        dialogBuilder.setTitle(DIALOG_TITLE);
+        dialogBuilder.setMessage(DIALOG_MESSAGE);
 
         final EditText input = new EditText(getContext());
         input.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
@@ -151,7 +152,7 @@ public class CsvFragment extends ListFragment implements AdapterView.OnItemClick
     private int insertRecords(File fileName) {
         CsvParser csvParser = new CsvParser(mGroupNumber, fileName);
         List<Student> studentList = csvParser.parseFile();
-        mStudentsDBHandler.insertStudents(studentList);
+        mStudentsDbHandler.insertStudents(studentList);
         return studentList.size();
     }
 

@@ -22,9 +22,8 @@ import com.studios.lucian.students.MainActivity;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.model.Group;
 import com.studios.lucian.students.model.Student;
-import com.studios.lucian.students.util.Constants;
-import com.studios.lucian.students.util.ExcelParser;
-import com.studios.lucian.students.util.StudentsDBHandler;
+import com.studios.lucian.students.util.parser.ExcelParser;
+import com.studios.lucian.students.util.StudentsDbHandler;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,6 +34,9 @@ import java.util.List;
  */
 public class ExcelFragment extends ListFragment implements AdapterView.OnItemClickListener {
     private static final String TAG = ExcelFragment.class.getSimpleName();
+    public static String FORMAT_NOT_SUPPORTED = "The selected file doesn't have the proper format.";
+    public static String DIALOG_MESSAGE = "Please specify the group number for this file";
+    public static String DIALOG_TITLE = "Group Number";
     private static final int POSITION_MAIN_FRAGMENT = 0;
     private static String DOT = ".";
     public static String XLS = ".xls";
@@ -44,7 +46,7 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
     private String mFileExplorerRoot;
     private List<String> mPath;
     private TextView mTextViewPath;
-    private StudentsDBHandler mStudentsDBHandler;
+    private StudentsDbHandler mStudentsDbHandler;
 
     public ExcelFragment() {
         mFileExplorerRoot = Environment.getExternalStorageDirectory().getPath();
@@ -67,7 +69,7 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-        mStudentsDBHandler = new StudentsDBHandler(getActivity());
+        mStudentsDbHandler = new StudentsDbHandler(getActivity());
         getListView().setOnItemClickListener(this);
         getDirectories(mFileExplorerRoot);
     }
@@ -78,6 +80,8 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
         mPath = new ArrayList<>();
         File file = new File(dirPath);
         File[] files = file.listFiles();
+
+        Log.v(TAG, dirPath);
 
         if (!dirPath.equals(mFileExplorerRoot)) {
             item.add(mFileExplorerRoot);
@@ -114,7 +118,7 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
             if (fileExtension.equals(XLS) || fileExtension.equals(XLSX)) {
                 dialogBoxSelectionGroupNumber(file);
             } else {
-                Toast.makeText(getContext(), Constants.FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -122,8 +126,8 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
     private void dialogBoxSelectionGroupNumber(final File file) {
         android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(getContext());
 
-        dialogBuilder.setTitle(Constants.DIALOG_TITLE);
-        dialogBuilder.setMessage(Constants.DIALOG_MESSAGE);
+        dialogBuilder.setTitle(DIALOG_TITLE);
+        dialogBuilder.setMessage(DIALOG_MESSAGE);
 
         final EditText input = new EditText(getContext());
         input.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
@@ -164,7 +168,7 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
     private int insertRecords(File fileName) {
         ExcelParser excelParser = new ExcelParser(mGroupNumber, fileName.getAbsolutePath());
         List<Student> studentList = excelParser.parseFile();
-        mStudentsDBHandler.insertStudents(studentList);
+        mStudentsDbHandler.insertStudents(studentList);
         return studentList.size();
     }
 

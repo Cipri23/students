@@ -40,5 +40,9 @@
     <string name="add_note">+Note</string>
     <string name="student_list_button_1">+GRADE</string>
     <string name="student_list_button_2">SOME ACTION</string>
+    <string name="add_grade">ADD GRADE</string>
+    <string name="button_add_grade">ADD GRADE</string>
+    <string name="grade">GRADE</string>
+    <string name="lab_no">HOMEWORK</string>
 
 </resources>

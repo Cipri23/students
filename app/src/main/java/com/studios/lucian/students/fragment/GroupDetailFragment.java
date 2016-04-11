@@ -21,7 +21,7 @@ import android.widget.Toast;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.adapter.StudentsListAdapter;
 import com.studios.lucian.students.model.Student;
-import com.studios.lucian.students.util.StudentsDBHandler;
+import com.studios.lucian.students.util.StudentsDbHandler;
 import com.studios.lucian.students.util.Validator;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class GroupDetailFragment extends ListFragment {
     private TextView emptyText;
 
     private Validator mValidator;
-    private StudentsDBHandler mStudentsDBHandler;
+    private StudentsDbHandler mStudentsDbHandler;
     private StudentsListAdapter listAdapter;
 
     private String mGroupNumber;
@@ -52,7 +52,7 @@ public class GroupDetailFragment extends ListFragment {
         mGroupNumber = bundle.getString("groupNumber");
         Log.v(TAG, "backStackCount = " + getFragmentManager().getBackStackEntryCount());
 
-        mStudentsDBHandler = new StudentsDBHandler(getActivity());
+        mStudentsDbHandler = new StudentsDbHandler(getActivity());
         mValidator = new Validator();
         return inflater.inflate(R.layout.fragment_home_group_detail, container, false);
     }
@@ -64,7 +64,17 @@ public class GroupDetailFragment extends ListFragment {
         mFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.fab);
         emptyText = (TextView) view.findViewById(android.R.id.empty);
         setButtonClickListener();
+        setListClickListener();
         setAdapter();
+    }
+
+    private void setListClickListener() {
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(getContext(), "Clicked" + i, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -109,7 +119,7 @@ public class GroupDetailFragment extends ListFragment {
 
     private void addNewStudent(String matricol, String name, String surname) {
         Student student = new Student(String.valueOf(mGroupNumber), matricol, name, surname);
-        if (mStudentsDBHandler.addStudent(student)) {
+        if (mStudentsDbHandler.addStudent(student)) {
             mStudentsList.add(student);
             listAdapter.notifyDataSetChanged();
             Toast.makeText(getContext(), R.string.student_added, Toast.LENGTH_SHORT).show();
@@ -169,7 +179,7 @@ public class GroupDetailFragment extends ListFragment {
 
     private void updateStudent(int id, String matricol, String name, String surname) {
         Student student = new Student(String.valueOf(mGroupNumber), matricol, name, surname);
-        if (mStudentsDBHandler.updateStudent(student)) {
+        if (mStudentsDbHandler.updateStudent(student)) {
             mStudentsList.set(id, student);
             listAdapter.notifyDataSetChanged();
         } else {
@@ -179,7 +189,7 @@ public class GroupDetailFragment extends ListFragment {
 
     private void deleteStudent(int id) {
         Student student = mStudentsList.get(id);
-        if (mStudentsDBHandler.deleteStudent(student)) {
+        if (mStudentsDbHandler.deleteStudent(student)) {
             mStudentsList.remove(id);
             listAdapter.notifyDataSetChanged();
         } else {
@@ -188,7 +198,7 @@ public class GroupDetailFragment extends ListFragment {
     }
 
     private void setAdapter() {
-        mStudentsList = mStudentsDBHandler.getStudentsFromGroup(mGroupNumber);
+        mStudentsList = mStudentsDbHandler.getStudentsFromGroup(mGroupNumber);
         listAdapter = new StudentsListAdapter(getContext(), R.layout.item_student, mStudentsList);
         setListAdapter(listAdapter);
     }

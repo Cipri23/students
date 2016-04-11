@@ -2,6 +2,7 @@ package com.studios.lucian.students.util;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.studios.lucian.students.model.Group;
 import com.studios.lucian.students.model.Student;
@@ -12,12 +13,13 @@ import java.util.List;
 /**
  * Created with Love by Lucian and Pi on 05.03.2016.
  */
-public class StudentsDBHandler {
-    private String TAG = StudentsDBHandler.class.getSimpleName();
+public class StudentsDbHandler {
+    private String TAG = StudentsDbHandler.class.getSimpleName();
 
     private StudentDAO mStudentDAO;
 
-    public StudentsDBHandler(Context context) {
+    public StudentsDbHandler(Context context) {
+        Log.v(TAG, "StudentsDbHandler");
         mStudentDAO = new StudentDAO(context);
     }
 

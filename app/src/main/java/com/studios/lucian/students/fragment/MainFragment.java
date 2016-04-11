@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.adapter.GridAdapter;
 import com.studios.lucian.students.model.Group;
-import com.studios.lucian.students.util.StudentsDBHandler;
+import com.studios.lucian.students.util.StudentsDbHandler;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class MainFragment extends Fragment {
     private GridView mGridView;
     private TextView mTextViewEmpty;
     private GridAdapter mGridAdapter;
-    private StudentsDBHandler mStudentsDBHandler;
+    private StudentsDbHandler mStudentsDbHandler;
     private List<Group> mGroups;
 
     public MainFragment() {
@@ -38,8 +38,8 @@ public class MainFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        mStudentsDBHandler = new StudentsDBHandler(getContext());
-        mGroups = mStudentsDBHandler.getUniqueGroups();
+        mStudentsDbHandler = new StudentsDbHandler(getContext());
+        mGroups = mStudentsDbHandler.getUniqueGroups();
     }
 
     @Nullable

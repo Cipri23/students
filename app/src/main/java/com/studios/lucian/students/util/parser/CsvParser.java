@@ -1,4 +1,4 @@
-package com.studios.lucian.students.util;
+package com.studios.lucian.students.util.parser;
 
 import android.util.Log;
 
