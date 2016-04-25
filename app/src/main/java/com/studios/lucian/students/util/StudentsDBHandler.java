@@ -14,12 +14,12 @@ import java.util.List;
  * Created with Love by Lucian and Pi on 05.03.2016.
  */
 public class StudentsDbHandler {
-    private String TAG = StudentsDbHandler.class.getSimpleName();
+    private final String TAG = StudentsDbHandler.class.getSimpleName();
 
-    private StudentDAO mStudentDAO;
+    private final StudentDAO mStudentDAO;
 
     public StudentsDbHandler(Context context) {
-        Log.v(TAG, "StudentsDbHandler");
+        Log.i(TAG, "StudentsDbHandler");
         mStudentDAO = new StudentDAO(context);
     }
 
@@ -70,6 +70,10 @@ public class StudentsDbHandler {
             if (affectedRows == 1) return true;
         }
         return false;
+    }
+
+    public Student findStudent(String matricol) {
+        return mStudentDAO.find(matricol);
     }
 
     public List<Group> getUniqueGroups() {

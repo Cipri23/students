@@ -16,11 +16,11 @@ import java.util.List;
  * Created with Love by Lucian and Pi on 22.03.2016.
  */
 public class CsvParser {
-    private static String TAG = CsvParser.class.getSimpleName();
-    public static String CSV_DEFAULT_SEPARATOR = ";";
+    private static final String TAG = CsvParser.class.getSimpleName();
+    private static final String CSV_DEFAULT_SEPARATOR = ";";
 
-    private File mFile;
-    private String mGroupNumber;
+    private final File mFile;
+    private final String mGroupNumber;
 
     public CsvParser(String groupNumber, File filePath) {
         mGroupNumber = groupNumber;
@@ -41,13 +41,13 @@ public class CsvParser {
                 studentList.add(new Student(mGroupNumber, components[0], components[1], components[2]));
             }
         } catch (FileNotFoundException e) {
-            Log.v(TAG, e.getMessage());
+            Log.i(TAG, e.getMessage());
         } catch (IOException e) {
-            Log.v(TAG, e.getMessage());
+            Log.i(TAG, e.getMessage());
             try {
                 fileReader.close();
             } catch (IOException e1) {
-                Log.v(TAG, e1.getMessage());
+                Log.i(TAG, e1.getMessage());
             }
         } finally {
             try {
@@ -55,7 +55,7 @@ public class CsvParser {
                     bufferedReader.close();
                 }
             } catch (IOException e) {
-                Log.v(TAG, e.getMessage());
+                Log.i(TAG, e.getMessage());
             }
         }
         return studentList;

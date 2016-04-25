@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.studios.lucian.students.model.Group;
@@ -43,7 +42,7 @@ public class StudentDAO extends DataBaseHelper {
         SQLiteDatabase database = getWritableDatabase();
         database.insert(TABLE_NAME_STUDENT, null, contentValues);
         database.close();
-        Log.v(TAG, "Student Added: " + student.toString());
+        Log.i(TAG, "Student Added: " + student.toString());
     }
 
     public int delete(Student student) {
@@ -54,10 +53,10 @@ public class StudentDAO extends DataBaseHelper {
             if (database.isOpen()) {
                 database.close();
             }
-            Log.v(TAG, "delete result: " + affectedRows);
+            Log.i(TAG, "delete result: " + affectedRows);
             return affectedRows;
         } catch (SQLiteException ex) {
-            Log.v(TAG, ex.getMessage());
+            Log.i(TAG, ex.getMessage());
         }
         return ERROR_CODE;
     }
@@ -78,12 +77,12 @@ public class StudentDAO extends DataBaseHelper {
             name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME));
             surname = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_SURNAME));
             studentList.add(new Student(groupNumber, matricol, name, surname));
-            Log.v(TAG, "Student: " + groupNumber + " " + matricol + " " + name + " " + surname);
+            Log.i(TAG, "Student: " + groupNumber + " " + matricol + " " + name + " " + surname);
         }
         cursor.close();
         database.close();
 
-        Log.v(TAG, "Number of retrieved rows: " + retrievedRows);
+        Log.i(TAG, "Number of retrieved rows: " + retrievedRows);
         return studentList;
     }
 
@@ -100,14 +99,39 @@ public class StudentDAO extends DataBaseHelper {
             if (result == 1) return true;
             if (database.isOpen()) database.close();
         } catch (SQLiteException ex) {
-            Log.v(TAG, ex.getMessage());
+            Log.i(TAG, ex.getMessage());
         }
         return false;
     }
 
+    public Student find(String matricol) {
+        Student student;
+        try {
+            SQLiteDatabase database = getReadableDatabase();
+            String query = "SELECT * FROM " + TABLE_NAME_STUDENT + " WHERE " + COLUMN_NAME_MATRICOL + " =?";
+            Cursor cursor = database.rawQuery(query, new String[]{matricol});
+
+            if (cursor.getCount() != 1) {
+                Log.i(TAG, "find student with matricol as parameter not returned exactly one student. Matricol: " + matricol);
+                return null;
+            }
+            cursor.moveToFirst();
+            String groupNumber = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_GROUP_NUMBER));
+            String name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME));
+            String surname = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_SURNAME));
+            student = new Student(groupNumber, matricol, name, surname);
+
+            if (!cursor.isClosed()) cursor.close();
+            if (database.isOpen()) database.close();
+        } catch (SQLiteException ex) {
+            Log.i(TAG, ex.getMessage());
+            return null;
+        }
+        return student;
+    }
+
     public int update(Student student) {
         ContentValues contentValues = new ContentValues();
-        String WHERE_CLAUSE = COLUMN_NAME_MATRICOL + "=" + student.getMatricol();
         try {
             SQLiteDatabase database = getWritableDatabase();
 
@@ -118,7 +142,7 @@ public class StudentDAO extends DataBaseHelper {
             if (database.isOpen()) database.close();
             return affectedRows;
         } catch (SQLiteException ex) {
-            Log.v(TAG, ex.getMessage());
+            Log.i(TAG, ex.getMessage());
         }
         return ERROR_CODE;
     }
@@ -147,7 +171,7 @@ public class StudentDAO extends DataBaseHelper {
             if (!cursor.isClosed()) cursor.close();
             if (database.isOpen()) database.close();
         } catch (SQLiteException ex) {
-            Log.v(TAG, ex.getMessage());
+            Log.i(TAG, ex.getMessage());
         }
         return groupList;
     }
@@ -167,12 +191,12 @@ public class StudentDAO extends DataBaseHelper {
             name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME));
             surname = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_SURNAME));
             studentList.add(new Student(groupNumber, matricol, name, surname));
-            Log.v(TAG, "Student: " + groupNumber + " " + matricol + " " + name + " " + surname);
+            Log.i(TAG, "Student: " + groupNumber + " " + matricol + " " + name + " " + surname);
         }
         cursor.close();
         database.close();
 
-        Log.v(TAG, "Number of retrieved rows: " + retrievedRows);
+        Log.i(TAG, "Number of retrieved rows: " + retrievedRows);
         return studentList;
     }
 }

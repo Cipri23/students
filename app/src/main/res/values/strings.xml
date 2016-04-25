@@ -44,5 +44,10 @@
     <string name="button_add_grade">ADD GRADE</string>
     <string name="grade">GRADE</string>
     <string name="lab_no">HOMEWORK</string>
+    <string name="title_activity_display_message">Student</string>
+    <string name="no_grades">No grades given yet.</string>
+    <string name="homework_number">Homework number: </string>
+    <string name="date">Date:</string>
+    <string name="grade_display">Grade:</string>
 
 </resources>

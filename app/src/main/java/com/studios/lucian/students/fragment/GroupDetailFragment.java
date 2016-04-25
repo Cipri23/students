@@ -2,6 +2,7 @@ package com.studios.lucian.students.fragment;
 
 import android.app.ListFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.studios.lucian.students.R;
+import com.studios.lucian.students.activity.DisplaySelectedStudent;
 import com.studios.lucian.students.adapter.StudentsListAdapter;
 import com.studios.lucian.students.model.Student;
 import com.studios.lucian.students.util.StudentsDbHandler;
@@ -29,38 +31,37 @@ import java.util.List;
 public class GroupDetailFragment extends ListFragment {
     private static final String TAG = GroupDetailFragment.class.getSimpleName();
     private static final String GROUP = "Group ";
+    private static final String KEY_MATRICOL = "matricol";
 
     private FloatingActionButton mFloatingActionButton;
     private TextView emptyText;
 
-    private Validator mValidator;
     private StudentsDbHandler mStudentsDbHandler;
     private StudentsListAdapter listAdapter;
 
     private String mGroupNumber;
-    private String EMPTY_SPACE = " ";
+    private final String EMPTY_SPACE = " ";
     private List<Student> mStudentsList;
 
     public GroupDetailFragment() {
-        Log.v(TAG, "GroupFragment");
+        Log.i(TAG, "GroupFragment");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.v(TAG, "onCreateView");
+        Log.i(TAG, "onCreateView");
         Bundle bundle = this.getArguments();
         mGroupNumber = bundle.getString("groupNumber");
-        Log.v(TAG, "backStackCount = " + getFragmentManager().getBackStackEntryCount());
+        Log.i(TAG, "backStackCount = " + getFragmentManager().getBackStackEntryCount());
 
         mStudentsDbHandler = new StudentsDbHandler(getActivity());
-        mValidator = new Validator();
         return inflater.inflate(R.layout.fragment_home_group_detail, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.v(TAG, "onViewCreated");
+        Log.i(TAG, "onViewCreated");
         mFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.fab);
         emptyText = (TextView) view.findViewById(android.R.id.empty);
         setButtonClickListener();
@@ -72,7 +73,10 @@ public class GroupDetailFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getContext(), "Clicked" + i, Toast.LENGTH_SHORT).show();
+                Student student = (Student) getListView().getItemAtPosition(i);
+                Intent intent = new Intent(getActivity(), DisplaySelectedStudent.class);
+                intent.putExtra(KEY_MATRICOL, student.getMatricol());
+                startActivity(intent);
             }
         });
     }
@@ -86,7 +90,7 @@ public class GroupDetailFragment extends ListFragment {
 
     @Override
     public void onResume() {
-        Log.v(TAG, "onResume");
+        Log.i(TAG, "onResume");
         super.onResume();
         registerForContextMenu(getListView());
     }
@@ -148,11 +152,11 @@ public class GroupDetailFragment extends ListFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         boolean inputsAreOk = true;
-                        if (!mValidator.isValidName(dialogName.getText().toString())) {
+                        if (!Validator.isValidName(dialogName.getText().toString())) {
                             inputsAreOk = false;
                             dialogName.setError("Invalid Name");
                         }
-                        if (!mValidator.isValidName(dialogSurname.getText().toString())) {
+                        if (!Validator.isValidName(dialogSurname.getText().toString())) {
                             inputsAreOk = false;
                             dialogSurname.setError("Invalid Surname");
                         }
@@ -199,7 +203,7 @@ public class GroupDetailFragment extends ListFragment {
 
     private void setAdapter() {
         mStudentsList = mStudentsDbHandler.getStudentsFromGroup(mGroupNumber);
-        listAdapter = new StudentsListAdapter(getContext(), R.layout.item_student, mStudentsList);
+        listAdapter = new StudentsListAdapter(getContext(), mStudentsList);
         setListAdapter(listAdapter);
     }
 
@@ -222,15 +226,15 @@ public class GroupDetailFragment extends ListFragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 boolean inputsAreOk = true;
-                                if (!mValidator.isValidMatricol(dialogMatricol.getText().toString())) {
+                                if (!Validator.isValidMatricol(dialogMatricol.getText().toString())) {
                                     inputsAreOk = false;
                                     dialogMatricol.setError("Invalid Student ID");
                                 }
-                                if (!mValidator.isValidName(dialogName.getText().toString())) {
+                                if (!Validator.isValidName(dialogName.getText().toString())) {
                                     inputsAreOk = false;
                                     dialogName.setError("Invalid Name");
                                 }
-                                if (!mValidator.isValidName(dialogSurname.getText().toString())) {
+                                if (!Validator.isValidName(dialogSurname.getText().toString())) {
                                     inputsAreOk = false;
                                     dialogSurname.setError("Invalid Surname");
                                 }

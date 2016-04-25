@@ -2,7 +2,9 @@ package com.studios.lucian.students.fragment;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.IntentSender;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +14,11 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.MetadataChangeSet;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.adapter.GridAdapter;
 import com.studios.lucian.students.model.Group;
@@ -30,13 +37,14 @@ public class MainFragment extends Fragment {
     private GridAdapter mGridAdapter;
     private StudentsDbHandler mStudentsDbHandler;
     private List<Group> mGroups;
+    private GoogleApiClient mGoogleApiClient;
 
     public MainFragment() {
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.v(TAG, "onCreate");
+        Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         mStudentsDbHandler = new StudentsDbHandler(getContext());
         mGroups = mStudentsDbHandler.getUniqueGroups();
@@ -45,7 +53,7 @@ public class MainFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.v(TAG, "onCreateView");
+        Log.i(TAG, "onCreateView");
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -90,4 +98,37 @@ public class MainFragment extends Fragment {
         mGroups.add(group);
         mGridAdapter.notifyDataSetChanged();
     }
+
+    public void setGoogleApiClient(GoogleApiClient mGoogleApiClient) {
+        Log.i(TAG, "setGoogleApiClient: " + mGoogleApiClient.isConnected());
+        this.mGoogleApiClient = mGoogleApiClient;
+    }
+
+    public void createFileInDrive() {
+        if (mGoogleApiClient.isConnected()) {
+            //Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(driveContentsCallback);
+        } else {
+            Log.i(TAG, "createFileInDrive: client isn't connected. Can't create drive file.");
+        }
+    }
+
+    final ResultCallback<DriveApi.DriveContentsResult> driveContentsCallback =
+            new ResultCallback<DriveApi.DriveContentsResult>() {
+                @Override
+                public void onResult(@NonNull DriveApi.DriveContentsResult result) {
+                    MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
+                            .setMimeType("text/html").build();
+                    IntentSender intentSender = Drive.DriveApi
+                            .newCreateFileActivityBuilder()
+                            .setInitialMetadata(metadataChangeSet)
+                            .setInitialDriveContents(result.getDriveContents())
+                            .build(mGoogleApiClient);
+//                    try {
+//                        startIntentSenderForResult(
+//                                intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
+//                    } catch (IntentSender.SendIntentException e) {
+//                        Log.w(TAG, "Unable to send intent", e);
+//                    }
+                }
+            };
 }

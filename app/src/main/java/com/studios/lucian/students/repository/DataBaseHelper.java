@@ -9,7 +9,7 @@ import android.util.Log;
 /**
  * Created with Love by Lucian and Pi on 09.04.2016.
  */
-public class DataBaseHelper extends SQLiteOpenHelper {
+class DataBaseHelper extends SQLiteOpenHelper {
     private static final String TAG = DataBaseHelper.class.getSimpleName();
 
     private static final int DATABASE_VERSION = 1;
@@ -47,9 +47,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String DROP_TABLE_STUDENT = "DROP TABLE IF EXISTS " + TABLE_NAME_STUDENT;
     private static final String DROP_TABLE_GRADE = "DROP TABLE IF EXISTS " + TABLE_NAME_GRADE;
 
-    public DataBaseHelper(Context context) {
+    DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        Log.v(TAG, "DataBaseHelper");
+        Log.i(TAG, "DataBaseHelper");
     }
 
     @Override
@@ -66,7 +66,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(CREATE_TABLE_STUDENT);
             sqLiteDatabase.execSQL(CREATE_TABLE_GRADE);
         } catch (SQLiteException ex) {
-            Log.v(TAG, ex.getMessage());
+            Log.i(TAG, ex.getMessage());
         }
     }
 
@@ -77,7 +77,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(DROP_TABLE_STUDENT);
             onCreate(sqLiteDatabase);
         } catch (SQLiteException ex) {
-            Log.v(TAG, ex.getMessage());
+            Log.i(TAG, ex.getMessage());
         }
     }
 }

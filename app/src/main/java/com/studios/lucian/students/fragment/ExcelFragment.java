@@ -18,12 +18,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.studios.lucian.students.MainActivity;
 import com.studios.lucian.students.R;
+import com.studios.lucian.students.activity.MainActivity;
 import com.studios.lucian.students.model.Group;
 import com.studios.lucian.students.model.Student;
-import com.studios.lucian.students.util.parser.ExcelParser;
+import com.studios.lucian.students.util.DialogsHandler;
 import com.studios.lucian.students.util.StudentsDbHandler;
+import com.studios.lucian.students.util.Validator;
+import com.studios.lucian.students.util.parser.ExcelParser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,17 +35,20 @@ import java.util.List;
  * Created with love by Lucian and @Pi on 25.01.2016.
  */
 public class ExcelFragment extends ListFragment implements AdapterView.OnItemClickListener {
-    private static final String TAG = ExcelFragment.class.getSimpleName();
-    public static String FORMAT_NOT_SUPPORTED = "The selected file doesn't have the proper format.";
-    public static String DIALOG_MESSAGE = "Please specify the group number for this file";
-    public static String DIALOG_TITLE = "Group Number";
-    private static final int POSITION_MAIN_FRAGMENT = 0;
-    private static String DOT = ".";
-    public static String XLS = ".xls";
-    public static String XLSX = ".xlsx";
 
-    private String mGroupNumber;
-    private String mFileExplorerRoot;
+    private static final String TAG = ExcelFragment.class.getSimpleName();
+    private static final String NOT_IMPLEMENTED_YET = "XLSX format is not supported yet.";
+    private static final String ERROR_TRYING_PARSE = "An error occurred when the file was parsed.";
+    private static final String FORMAT_NOT_SUPPORTED = "The selected file doesn't have the proper format: ";
+    private static final String DIALOG_MESSAGE = "Please specify the group number for this file (between 0 and 10000):";
+    private static final String DIALOG_TITLE = "Group Number";
+    private static final int POSITION_MAIN_FRAGMENT = 0;
+    private static final int REQUEST_CODE_RESOLUTION = 3;
+    private static final String DOT = ".";
+    private static final String XLS = ".xls";
+    private static final String XLSX = ".xlsx";
+
+    private final String mFileExplorerRoot;
     private List<String> mPath;
     private TextView mTextViewPath;
     private StudentsDbHandler mStudentsDbHandler;
@@ -81,7 +86,7 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
         File file = new File(dirPath);
         File[] files = file.listFiles();
 
-        Log.v(TAG, dirPath);
+        Log.i(TAG, dirPath);
 
         if (!dirPath.equals(mFileExplorerRoot)) {
             item.add(mFileExplorerRoot);
@@ -115,10 +120,16 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
             }
         } else {
             String fileExtension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(DOT));
-            if (fileExtension.equals(XLS) || fileExtension.equals(XLSX)) {
-                dialogBoxSelectionGroupNumber(file);
-            } else {
-                Toast.makeText(getContext(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG).show();
+            switch (fileExtension) {
+                case XLS:
+                    dialogBoxSelectionGroupNumber(file);
+                    break;
+                case XLSX:
+                    Toast.makeText(getContext(), NOT_IMPLEMENTED_YET, Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    Toast.makeText(getContext(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG).show();
+                    break;
             }
         }
     }
@@ -137,8 +148,12 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
         dialogBuilder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                mGroupNumber = input.getText().toString();
-                handleXlsFile(file);
+                String userInput = input.getText().toString();
+                if (Validator.isValidGroupNumber(userInput)) {
+                    handleXlsFile(file, userInput);
+                } else {
+                    DialogsHandler.showWrongGroupNumber(userInput, getContext());
+                }
             }
         });
         dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -151,25 +166,33 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
         dialog.show();
     }
 
-    private void handleXlsFile(File file) {
-        int studentsCount = insertRecords(file);
-        Group group = new Group(mGroupNumber, studentsCount);
-        redirectToMainFragment(group);
-        setNavDrawerItemAsChecked();
+    private void handleXlsFile(File file, String groupNumber) {
+        try {
+            int studentsCount = insertRecords(file, groupNumber);
+            Group group = new Group(groupNumber, studentsCount);
+            redirectToMainFragment(group);
+            setNavDrawerItemAsChecked();
+        } catch (Exception e) {
+            DialogsHandler.showErrorMessage(e.getMessage(), getContext());
+        }
     }
 
     private void redirectToMainFragment(Group group) {
         MainFragment mainFragment = ((MainActivity) getActivity()).getMainFragment();
         mainFragment.addNewGroup(group);
-    //    getChildFragmentManager().popBackStack();
+        mainFragment.createFileInDrive();
         getFragmentManager().beginTransaction().replace(R.id.main_content, mainFragment).commit();
     }
 
-    private int insertRecords(File fileName) {
-        ExcelParser excelParser = new ExcelParser(mGroupNumber, fileName.getAbsolutePath());
-        List<Student> studentList = excelParser.parseFile();
-        mStudentsDbHandler.insertStudents(studentList);
-        return studentList.size();
+    private int insertRecords(File fileName, String groupNumber) throws Exception {
+        try {
+            ExcelParser excelParser = new ExcelParser(groupNumber, fileName.getAbsolutePath());
+            List<Student> studentList = excelParser.parseFile();
+            mStudentsDbHandler.insertStudents(studentList);
+            return studentList.size();
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
     }
 
     private void setNavDrawerItemAsChecked() {

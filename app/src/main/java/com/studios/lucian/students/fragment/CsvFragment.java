@@ -18,7 +18,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.studios.lucian.students.MainActivity;
+import com.studios.lucian.students.activity.MainActivity;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.model.Group;
 import com.studios.lucian.students.model.Student;
@@ -33,14 +33,14 @@ import java.util.List;
  * A simple {@link } subclass.
  */
 public class CsvFragment extends ListFragment implements AdapterView.OnItemClickListener {
-    public static String FORMAT_NOT_SUPPORTED = "The selected file doesn't have the proper format.";
-    public static String DIALOG_MESSAGE = "Please specify the group number for this file";
-    public static String DIALOG_TITLE = "Group Number";
-    public static String CSV = ".csv";
-    private static String DOT = ".";
-    private String TAG = CsvFragment.class.getSimpleName();
+    private static final String FORMAT_NOT_SUPPORTED = "The selected file doesn't have the proper format.";
+    private static final String DIALOG_MESSAGE = "Please specify the group number for this file";
+    private static final String DIALOG_TITLE = "Group Number";
+    private static final String CSV = ".csv";
+    private static final String DOT = ".";
+    private final String TAG = CsvFragment.class.getSimpleName();
     private String mGroupNumber;
-    private String mFileExplorerRoot;
+    private final String mFileExplorerRoot;
     private List<String> mPath;
     private StudentsDbHandler mStudentsDbHandler;
 

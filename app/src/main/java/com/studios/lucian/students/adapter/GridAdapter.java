@@ -17,8 +17,8 @@ import java.util.List;
  */
 public class GridAdapter extends BaseAdapter {
 
-    private List<Group> mGroups;
-    private Context mContext;
+    private final List<Group> mGroups;
+    private final Context mContext;
 
     public GridAdapter(Context context, List<Group> groups) {
         mContext = context;

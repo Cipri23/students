@@ -1,8 +1,5 @@
 package com.studios.lucian.students.model;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * Created with Love by Lucian and Pi on 09.04.2016.
  */
@@ -10,17 +7,17 @@ public class Grade {
     private String matricol;
     private int grade;
     private int labNumber;
-    private SimpleDateFormat date;
+    private String date;
 
     public String getDate() {
-        return date.format(new Date());
+        return date;
     }
 
-    public void setDate(SimpleDateFormat date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
-    public Grade(String matricol, int grade, int labNumber, SimpleDateFormat date) {
+    public Grade(String matricol, int grade, int labNumber, String date) {
 
         this.matricol = matricol;
         this.grade = grade;
@@ -34,7 +31,7 @@ public class Grade {
                 "matricol='" + matricol + '\'' +
                 ", grade=" + grade +
                 ", labNumber=" + labNumber +
-                ", date=" + date.format(new Date()) +
+                ", date=" + date +
                 '}';
     }
 
@@ -45,11 +42,7 @@ public class Grade {
 
         Grade grade1 = (Grade) o;
 
-        if (grade != grade1.grade) return false;
-        if (labNumber != grade1.labNumber) return false;
-        if (matricol != null ? !matricol.equals(grade1.matricol) : grade1.matricol != null)
-            return false;
-        return date != null ? date.equals(grade1.date) : grade1.date == null;
+        return grade == grade1.grade && labNumber == grade1.labNumber && (matricol != null ? matricol.equals(grade1.matricol) : grade1.matricol == null && (date != null ? date.equals(grade1.date) : grade1.date == null));
 
     }
 

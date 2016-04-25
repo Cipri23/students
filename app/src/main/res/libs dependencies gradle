@@ -1,0 +1,5 @@
+compile files('libs/aspose-cells-8.7.0.jar')
+compile 'com.android.support:multidex:1.0.1'
+compile 'com.android.support:support-v4:23.3.0'
+compile 'com.google.android.gms:play-services-auth:8.4.0'
+compile 'com.android.support:appcompat-v7:23.3.0'

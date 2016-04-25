@@ -7,10 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.studios.lucian.students.R;
-import com.studios.lucian.students.model.Grade;
 import com.studios.lucian.students.model.Student;
 import com.studios.lucian.students.util.DialogsHandler;
 import com.studios.lucian.students.util.GradesDbHandler;
@@ -23,22 +21,17 @@ import java.util.List;
 public class StudentsListAdapter extends ArrayAdapter<Student> {
     private static String TAG = StudentsListAdapter.class.getSimpleName();
 
-    private DialogsHandler mDialogsHandler;
-    private GradesDbHandler mGradesDbHandler;
-    private Context mContext;
-    private List<Student> mStudentsList;
-    private int mResource;
+    private final DialogsHandler mDialogsHandler;
+    private final GradesDbHandler mGradesDbHandler;
+    private final Context mContext;
+    private final List<Student> mStudentsList;
+    private final int mResource;
 
-    static class ViewHolder {
-        public TextView textViewName, textViewUsername;
-        public Button buttonAdd;
-    }
-
-    public StudentsListAdapter(Context context, int resource, List<Student> objects) {
-        super(context, resource, objects);
+    public StudentsListAdapter(Context context, List<Student> objects) {
+        super(context, R.layout.item_student, objects);
         mContext = context;
         mStudentsList = objects;
-        mResource = resource;
+        mResource = R.layout.item_student;
         mDialogsHandler = new DialogsHandler(context);
         mGradesDbHandler = new GradesDbHandler(context);
     }
@@ -69,5 +62,10 @@ public class StudentsListAdapter extends ArrayAdapter<Student> {
             });
         }
         return rowView;
+    }
+
+    static class ViewHolder {
+        public TextView textViewName, textViewUsername;
+        public Button buttonAdd;
     }
 }

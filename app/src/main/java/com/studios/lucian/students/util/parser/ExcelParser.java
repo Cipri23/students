@@ -2,17 +2,14 @@ package com.studios.lucian.students.util.parser;
 
 import android.util.Log;
 
-import com.aspose.cells.Cells;
-import com.aspose.cells.FileFormatType;
-import com.aspose.cells.LoadOptions;
-import com.aspose.cells.Workbook;
-import com.aspose.cells.Worksheet;
 import com.studios.lucian.students.model.Student;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import jxl.Sheet;
+import jxl.Workbook;
 
 /**
  * Created with Love by Lucian and Pi on 04.03.2016.
@@ -27,49 +24,48 @@ public class ExcelParser {
     private static final String XLS_EXTENSION = ".xls";
     private static final String XLSX_EXTENSION = ".xlsx";
 
-    private String mGroupNumber;
-    private String mFilePath;
+    private final String mGroupNumber;
+    private final String mFilePath;
 
     public ExcelParser(String number, String absolutePath) {
-        Log.v(TAG, "ExcelParser");
+        Log.i(TAG, "ExcelParser");
         mGroupNumber = number;
         mFilePath = absolutePath;
     }
 
-    public List<Student> parseFile() {
-        Log.v(TAG, "parseFile");
+    public List<Student> parseFile() throws Exception {
+        Log.i(TAG, "parseFile");
+        // TODO use apache poi library for parsing Excel files. It's already downloaded.
         List<Student> studentsList = new ArrayList<>();
+
         try {
             File file = new File(mFilePath);
-            FileInputStream inputStream = new FileInputStream(file);
-            Workbook workbook = new Workbook(inputStream, getFileOptions());
-            Worksheet sheet = workbook.getWorksheets().get(0);
-            Cells cells = sheet.getCells();
+            Workbook workbook = Workbook.getWorkbook(file);
+            Sheet sheet = workbook.getSheet(0);
 
-            for (int i = SKIP_ROWS; i <= sheet.getCells().getMaxRow(); i++) {
+            for (int i = SKIP_ROWS; i < sheet.getRows(); i++) {
                 Student student = new Student(
                         mGroupNumber,
-                        sheet.getCells().get(i, INDEX_COLUMN_MATRICOL).getDisplayStringValue(),
-                        sheet.getCells().get(i, INDEX_COLUMN_NAME).getStringValueWithoutFormat(),
-                        sheet.getCells().get(i, INDEX_COLUMN_SURNAME).getStringValueWithoutFormat());
+                        sheet.getCell(INDEX_COLUMN_MATRICOL, i).getContents(),
+                        sheet.getCell(INDEX_COLUMN_NAME, i).getContents(),
+                        sheet.getCell(INDEX_COLUMN_SURNAME, i).getContents());
                 studentsList.add(student);
             }
             return studentsList;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            throw new Exception(ex);
         }
-        return null;
     }
 
-    private LoadOptions getFileOptions() {
-        //CellsHelper.detectFileFormat(absolutePath);
-        String extension = mFilePath.substring(mFilePath.lastIndexOf("."));
-        LoadOptions loadOptions;
-        if (extension.equals(XLS_EXTENSION)) {
-            loadOptions = new LoadOptions(FileFormatType.EXCEL_97_TO_2003);
-        } else {
-            loadOptions = new LoadOptions(FileFormatType.XLSX);
-        }
-        return loadOptions;
-    }
+//    private LoadOptions getFileOptions() {
+//        //CellsHelper.detectFileFormat(absolutePath);
+//        String extension = mFilePath.substring(mFilePath.lastIndexOf("."));
+//        LoadOptions loadOptions;
+//        if (extension.equals(XLS_EXTENSION)) {
+//            loadOptions = new LoadOptions(FileFormatType.EXCEL_97_TO_2003);
+//        } else {
+//            loadOptions = new LoadOptions(FileFormatType.XLSX);
+//        }
+//        return loadOptions;
+//    }
 }

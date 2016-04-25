@@ -13,16 +13,21 @@ import com.studios.lucian.students.model.Grade;
 import com.studios.lucian.students.model.Student;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 /**
  * Created with Love by Lucian and Pi on 09.04.2016.
  */
 public class DialogsHandler {
+    private static final String ERROR = "Error";
     private static String TAG = DialogsHandler.class.getSimpleName();
+    private static final String DIALOG_TITLE = "Invalid Group Number";
+    private static final String DIALOG_MESSAGE = "The number ";
+    private static final String DIALOG_MESSAGE_CONT = " seems to be invalid.\nPlease give a number between 0 and 10000.";
 
-    private Context mContext;
-    private GradesDbHandler mGradesDbHandler;
+    private final Context mContext;
+    private final GradesDbHandler mGradesDbHandler;
 
     public DialogsHandler(Context context) {
         mContext = context;
@@ -56,7 +61,7 @@ public class DialogsHandler {
                                 student.getMatricol(),
                                 numberPickerGrade.getValue(),
                                 numberPickerLab.getValue(),
-                                format);
+                                format.format(new Date()));
                         mGradesDbHandler.addGrade(grade[0]);
                     }
                 })
@@ -68,5 +73,33 @@ public class DialogsHandler {
                 })
                 .create()
                 .show();
+    }
+
+    public static void showWrongGroupNumber(String mGroupNumber, Context context) {
+        android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(context);
+        dialogBuilder.setTitle(DIALOG_TITLE);
+        dialogBuilder.setMessage(DIALOG_MESSAGE + mGroupNumber + DIALOG_MESSAGE_CONT);
+
+        dialogBuilder.setPositiveButton("Got it", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+
+        final android.support.v7.app.AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
+    }
+
+    public static void showErrorMessage(String message, Context context) {
+        android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(context);
+        dialogBuilder.setTitle(ERROR);
+        dialogBuilder.setMessage(message);
+        dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        final android.support.v7.app.AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
     }
 }

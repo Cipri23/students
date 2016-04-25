@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorControlNormal">#c5c5c5</item>
         <item name="colorControlActivated">#000</item>
-        <item name="colorControlHighlight">#4eae50</item>
+        <item name="colorControlHighlight">#C8E6C9</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

@@ -4,8 +4,9 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.studios.lucian.students.model.Grade;
-import com.studios.lucian.students.model.Student;
 import com.studios.lucian.students.repository.GradesDAO;
+
+import java.util.List;
 
 /**
  * Created with Love by Lucian and Pi on 09.04.2016.
@@ -13,8 +14,8 @@ import com.studios.lucian.students.repository.GradesDAO;
 public class GradesDbHandler {
     private static String TAG = GradesDbHandler.class.getSimpleName();
 
-    private Context mContext;
-    private GradesDAO mGradesDAO;
+    private final Context mContext;
+    private final GradesDAO mGradesDAO;
 
     public GradesDbHandler(Context context) {
         mContext = context;
@@ -27,5 +28,9 @@ public class GradesDbHandler {
         } else {
             Toast.makeText(mContext, "An error occurred when trying to add grade", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public List<Grade> getStudentGrades(String matricol) {
+        return mGradesDAO.getStudentGrades(matricol);
     }
 }
