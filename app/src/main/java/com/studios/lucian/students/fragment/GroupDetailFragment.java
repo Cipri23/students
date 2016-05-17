@@ -20,7 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.studios.lucian.students.R;
-import com.studios.lucian.students.activity.DisplaySelectedStudent;
+import com.studios.lucian.students.activity.DisplayStudentActivity;
 import com.studios.lucian.students.activity.MainActivity;
 import com.studios.lucian.students.adapter.StudentsListAdapter;
 import com.studios.lucian.students.model.Student;
@@ -72,7 +72,7 @@ public class GroupDetailFragment extends ListFragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Student student = (Student) getListView().getItemAtPosition(i);
-                Intent intent = new Intent(getActivity(), DisplaySelectedStudent.class);
+                Intent intent = new Intent(getActivity(), DisplayStudentActivity.class);
                 intent.putExtra(KEY_MATRICOL, student.getMatricol());
                 startActivity(intent);
             }

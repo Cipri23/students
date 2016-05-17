@@ -14,8 +14,8 @@ import com.studios.lucian.students.util.StudentsDbHandler;
 
 import java.util.List;
 
-public class DisplaySelectedStudent extends AppCompatActivity {
-    private static final String TAG = DisplaySelectedStudent.class.getSimpleName();
+public class DisplayStudentActivity extends AppCompatActivity {
+    private static final String TAG = DisplayStudentActivity.class.getSimpleName();
     private static final String KEY_MATRICOL = "matricol";
 
     private GradesDbHandler mGradesHandler;
