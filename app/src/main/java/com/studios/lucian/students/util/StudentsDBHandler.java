@@ -83,4 +83,12 @@ public class StudentsDbHandler {
     public List<Student> getStudentsFromGroup(String mGroupNumber) {
         return mStudentDAO.getStudentsFromGroup(mGroupNumber);
     }
+
+    public String getGroupDriveFileId(String mGroupNumber) {
+        return mStudentDAO.getGroupDriveFileId(mGroupNumber);
+    }
+
+    public void setGroupDriveId(String groupDriveId, String groupNumber) {
+        mStudentDAO.setGroupDriveId(groupDriveId, groupNumber);
+    }
 }

@@ -23,6 +23,7 @@ class DataBaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_STUDENT_GROUP_NUMBER = "groupnumber";
     private static final String COLUMN_STUDENT_NAME = "name";
     private static final String COLUMN_STUDENT_SURNAME = "surname";
+    private static final String COLUMN_STUDENT_DRIVE_FILE_ID = "driveid";
 
     // TABLE #GRADE#
     private static final String COLUMN_GRADE_MATRICOL = "matricol";
@@ -34,7 +35,8 @@ class DataBaseHelper extends SQLiteOpenHelper {
             COLUMN_STUDENT_MATRICOL + " TEXT PRIMARY KEY," +
             COLUMN_STUDENT_GROUP_NUMBER + " TEXT," +
             COLUMN_STUDENT_NAME + " TEXT," +
-            COLUMN_STUDENT_SURNAME + " TEXT" + ");";
+            COLUMN_STUDENT_SURNAME + " TEXT, " +
+            COLUMN_STUDENT_DRIVE_FILE_ID + " TEXT" + ");";
 
     private static final String CREATE_TABLE_GRADE = "CREATE TABLE " + TABLE_NAME_GRADE + " (" +
             COLUMN_GRADE_MATRICOL + " TEXT, " +

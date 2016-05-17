@@ -8,10 +8,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.model.Student;
 import com.studios.lucian.students.util.DialogsHandler;
-import com.studios.lucian.students.util.GradesDbHandler;
 
 import java.util.List;
 
@@ -22,18 +22,16 @@ public class StudentsListAdapter extends ArrayAdapter<Student> {
     private static String TAG = StudentsListAdapter.class.getSimpleName();
 
     private final DialogsHandler mDialogsHandler;
-    private final GradesDbHandler mGradesDbHandler;
     private final Context mContext;
     private final List<Student> mStudentsList;
     private final int mResource;
 
-    public StudentsListAdapter(Context context, List<Student> objects) {
+    public StudentsListAdapter(Context context, List<Student> objects, GoogleApiClient googleApiClient) {
         super(context, R.layout.item_student, objects);
         mContext = context;
         mStudentsList = objects;
         mResource = R.layout.item_student;
-        mDialogsHandler = new DialogsHandler(context);
-        mGradesDbHandler = new GradesDbHandler(context);
+        mDialogsHandler = new DialogsHandler(context, googleApiClient);
     }
 
     @Override

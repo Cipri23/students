@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.activity.DisplaySelectedStudent;
+import com.studios.lucian.students.activity.MainActivity;
 import com.studios.lucian.students.adapter.StudentsListAdapter;
 import com.studios.lucian.students.model.Student;
 import com.studios.lucian.students.util.StudentsDbHandler;
@@ -32,15 +33,12 @@ public class GroupDetailFragment extends ListFragment {
     private static final String TAG = GroupDetailFragment.class.getSimpleName();
     private static final String GROUP = "Group ";
     private static final String KEY_MATRICOL = "matricol";
-
+    private final String EMPTY_SPACE = " ";
     private FloatingActionButton mFloatingActionButton;
     private TextView emptyText;
-
     private StudentsDbHandler mStudentsDbHandler;
     private StudentsListAdapter listAdapter;
-
     private String mGroupNumber;
-    private final String EMPTY_SPACE = " ";
     private List<Student> mStudentsList;
 
     public GroupDetailFragment() {
@@ -122,7 +120,8 @@ public class GroupDetailFragment extends ListFragment {
     }
 
     private void addNewStudent(String matricol, String name, String surname) {
-        Student student = new Student(String.valueOf(mGroupNumber), matricol, name, surname);
+        String driveId = mStudentsDbHandler.getGroupDriveFileId(mGroupNumber);
+        Student student = new Student(String.valueOf(mGroupNumber), matricol, name, surname, driveId);
         if (mStudentsDbHandler.addStudent(student)) {
             mStudentsList.add(student);
             listAdapter.notifyDataSetChanged();
@@ -142,7 +141,7 @@ public class GroupDetailFragment extends ListFragment {
         final EditText dialogName = (EditText) alertView.findViewById(R.id.dialog_edit_name);
         final EditText dialogSurname = (EditText) alertView.findViewById(R.id.dialog_edit_surname);
 
-        Student student = mStudentsList.get(id);
+        final Student student = mStudentsList.get(id);
 
         dialogStudentName.setText(student.toString());
         dialogMatricolNumber.setText(student.getMatricol());
@@ -165,7 +164,8 @@ public class GroupDetailFragment extends ListFragment {
                                     id,
                                     dialogMatricolNumber.getText().toString(),
                                     dialogName.getText().toString(),
-                                    dialogSurname.getText().toString());
+                                    dialogSurname.getText().toString(),
+                                    student.getDriveFileId());
                         } else {
                             showWarning(R.string.error_update_student_title, R.string.error_update_student_message);
                         }
@@ -181,8 +181,8 @@ public class GroupDetailFragment extends ListFragment {
                 .show();
     }
 
-    private void updateStudent(int id, String matricol, String name, String surname) {
-        Student student = new Student(String.valueOf(mGroupNumber), matricol, name, surname);
+    private void updateStudent(int id, String matricol, String name, String surname, String driveFileId) {
+        Student student = new Student(String.valueOf(mGroupNumber), matricol, name, surname, driveFileId);
         if (mStudentsDbHandler.updateStudent(student)) {
             mStudentsList.set(id, student);
             listAdapter.notifyDataSetChanged();
@@ -203,7 +203,8 @@ public class GroupDetailFragment extends ListFragment {
 
     private void setAdapter() {
         mStudentsList = mStudentsDbHandler.getStudentsFromGroup(mGroupNumber);
-        listAdapter = new StudentsListAdapter(getContext(), mStudentsList);
+        MainFragment mainFragment = ((MainActivity) getActivity()).getMainFragment();
+        listAdapter = new StudentsListAdapter(getContext(), mStudentsList, mainFragment.getGoogleApiClient());
         setListAdapter(listAdapter);
     }
 

@@ -48,7 +48,8 @@ public class ExcelParser {
                         mGroupNumber,
                         sheet.getCell(INDEX_COLUMN_MATRICOL, i).getContents(),
                         sheet.getCell(INDEX_COLUMN_NAME, i).getContents(),
-                        sheet.getCell(INDEX_COLUMN_SURNAME, i).getContents());
+                        sheet.getCell(INDEX_COLUMN_SURNAME, i).getContents(),
+                        "");
                 studentsList.add(student);
             }
             return studentsList;

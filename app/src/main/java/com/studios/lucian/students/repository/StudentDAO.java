@@ -27,6 +27,7 @@ public class StudentDAO extends DataBaseHelper {
     private static final String COLUMN_NAME_MATRICOL = "matricol";
     private static final String COLUMN_NAME_NAME = "name";
     private static final String COLUMN_NAME_SURNAME = "surname";
+    private static final String COLUMN_NAME_DRIVE_FILE_ID = "driveid";
 
     public StudentDAO(Context context) {
         super(context);
@@ -38,6 +39,7 @@ public class StudentDAO extends DataBaseHelper {
         contentValues.put(COLUMN_NAME_MATRICOL, student.getMatricol());
         contentValues.put(COLUMN_NAME_NAME, student.getName());
         contentValues.put(COLUMN_NAME_SURNAME, student.getSurname());
+        contentValues.put(COLUMN_NAME_DRIVE_FILE_ID, student.getDriveFileId());
 
         SQLiteDatabase database = getWritableDatabase();
         database.insert(TABLE_NAME_STUDENT, null, contentValues);
@@ -63,7 +65,7 @@ public class StudentDAO extends DataBaseHelper {
 
     public List<Student> getAll() {
         List<Student> studentList = new ArrayList<>();
-        String groupNumber, matricol, name, surname;
+        String groupNumber, matricol, name, surname, driveId;
         int retrievedRows;
         SQLiteDatabase database = getWritableDatabase();
 
@@ -76,8 +78,9 @@ public class StudentDAO extends DataBaseHelper {
             matricol = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_MATRICOL));
             name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME));
             surname = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_SURNAME));
-            studentList.add(new Student(groupNumber, matricol, name, surname));
-            Log.i(TAG, "Student: " + groupNumber + " " + matricol + " " + name + " " + surname);
+            driveId = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DRIVE_FILE_ID));
+            studentList.add(new Student(groupNumber, matricol, name, surname, driveId));
+            Log.i(TAG, "Student: " + groupNumber + " " + matricol + " " + name + " " + surname + " " + driveId);
         }
         cursor.close();
         database.close();
@@ -119,7 +122,8 @@ public class StudentDAO extends DataBaseHelper {
             String groupNumber = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_GROUP_NUMBER));
             String name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME));
             String surname = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_SURNAME));
-            student = new Student(groupNumber, matricol, name, surname);
+            String driveId = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DRIVE_FILE_ID));
+            student = new Student(groupNumber, matricol, name, surname, driveId);
 
             if (!cursor.isClosed()) cursor.close();
             if (database.isOpen()) database.close();
@@ -178,7 +182,7 @@ public class StudentDAO extends DataBaseHelper {
 
     public List<Student> getStudentsFromGroup(String groupNumber) {
         List<Student> studentList = new ArrayList<>();
-        String matricol, name, surname;
+        String matricol, name, surname, driveId;
         int retrievedRows;
         SQLiteDatabase database = getWritableDatabase();
 
@@ -190,13 +194,37 @@ public class StudentDAO extends DataBaseHelper {
             matricol = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_MATRICOL));
             name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME));
             surname = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_SURNAME));
-            studentList.add(new Student(groupNumber, matricol, name, surname));
-            Log.i(TAG, "Student: " + groupNumber + " " + matricol + " " + name + " " + surname);
+            driveId = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DRIVE_FILE_ID));
+            studentList.add(new Student(groupNumber, matricol, name, surname, driveId));
+            Log.i(TAG, "Student: " + groupNumber + " " + matricol + " " + name + " " + surname + " " + driveId);
         }
         cursor.close();
         database.close();
 
         Log.i(TAG, "Number of retrieved rows: " + retrievedRows);
         return studentList;
+    }
+
+    public String getGroupDriveFileId(String mGroupNumber) {
+        String query = "SELECT " + COLUMN_NAME_DRIVE_FILE_ID + " FROM " + TABLE_NAME_STUDENT + " WHERE " + COLUMN_NAME_GROUP_NUMBER + "=" + mGroupNumber;
+        Cursor cursor = getReadableDatabase().rawQuery(query, null);
+        cursor.moveToFirst();
+        String fileDriveId = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DRIVE_FILE_ID));
+
+        if (!cursor.isClosed()) cursor.close();
+        return fileDriveId;
+    }
+
+    public void setGroupDriveId(String groupDriveId, String groupNumber) {
+        ContentValues contentValues = new ContentValues();
+        try {
+            SQLiteDatabase database = getWritableDatabase();
+            contentValues.put(COLUMN_NAME_DRIVE_FILE_ID, groupDriveId);
+            int affectedRows = database.update(TABLE_NAME_STUDENT, contentValues,
+                    COLUMN_NAME_GROUP_NUMBER + " = ?", new String[]{groupNumber});
+            Log.i(TAG, "setGroupDriveId: affectedRows = " + affectedRows);
+        } catch (SQLiteException ex) {
+            Log.i(TAG, "setGroupDriveId: " + ex.getMessage());
+        }
     }
 }

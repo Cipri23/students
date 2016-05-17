@@ -8,12 +8,14 @@ public class Student {
     private String groupNumber;
     private String name;
     private String surname;
+    private String driveFileId;
 
-    public Student(String groupNumber, String matricol, String name, String surname) {
+    public Student(String groupNumber, String matricol, String name, String surname, String driveFileId) {
         this.matricol = matricol;
         this.groupNumber = groupNumber;
         this.name = name;
         this.surname = surname;
+        this.driveFileId = driveFileId;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class Student {
 
         Student student = (Student) o;
 
-        return matricol != null ? matricol.equals(student.matricol) : student.matricol == null && (groupNumber != null ? groupNumber.equals(student.groupNumber) : student.groupNumber == null && (surname != null ? surname.equals(student.surname) : student.surname == null && (name != null ? name.equals(student.name) : student.name == null)));
+        return matricol != null ? matricol.equals(student.matricol) : student.matricol == null && (groupNumber != null ? groupNumber.equals(student.groupNumber) : student.groupNumber == null && (name != null ? name.equals(student.name) : student.name == null && (surname != null ? surname.equals(student.surname) : student.surname == null && (driveFileId != null ? driveFileId.equals(student.driveFileId) : student.driveFileId == null))));
 
     }
 
@@ -36,44 +38,50 @@ public class Student {
     public int hashCode() {
         int result = matricol != null ? matricol.hashCode() : 0;
         result = 31 * result + (groupNumber != null ? groupNumber.hashCode() : 0);
-        result = 31 * result + (surname != null ? surname.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (surname != null ? surname.hashCode() : 0);
+        result = 31 * result + (driveFileId != null ? driveFileId.hashCode() : 0);
         return result;
+    }
+
+    public String getMatricol() {
+
+        return matricol;
     }
 
     public void setMatricol(String matricol) {
         this.matricol = matricol;
     }
 
-    public void setGroupNumber(String groupNumber) {
-        this.groupNumber = groupNumber;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getMatricol() {
-        return matricol;
-    }
-
     public String getGroupNumber() {
         return groupNumber;
     }
 
-    public String getSurname() {
-        return surname;
+    public void setGroupNumber(String groupNumber) {
+        this.groupNumber = groupNumber;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getDisplayedMatricol() {
-        return "Matricol:\n" + matricol;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getDriveFileId() {
+        return driveFileId;
+    }
+
+    public void setDriveFileId(String driveFileId) {
+        this.driveFileId = driveFileId;
     }
 }

@@ -2,7 +2,6 @@ package com.studios.lucian.students.fragment;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,17 +12,24 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveContents;
+import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.adapter.GridAdapter;
 import com.studios.lucian.students.model.Group;
 import com.studios.lucian.students.util.StudentsDbHandler;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
 
 /**
@@ -38,6 +44,62 @@ public class MainFragment extends Fragment {
     private StudentsDbHandler mStudentsDbHandler;
     private List<Group> mGroups;
     private GoogleApiClient mGoogleApiClient;
+    private String groupNumber = null;
+    final private ResultCallback<DriveFolder.DriveFileResult> fileCallback = new
+            ResultCallback<DriveFolder.DriveFileResult>() {
+                @Override
+                public void onResult(@NonNull DriveFolder.DriveFileResult result) {
+                    if (!result.getStatus().isSuccess()) {
+                        Toast.makeText(getContext(), "Error while trying to create the file", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Log.i(TAG, "onResult: file created with id: " + result.getDriveFile().getDriveId());
+                    String groupDriveId = result.getDriveFile().getDriveId().encodeToString();
+                    if (groupNumber != null) {
+                        mStudentsDbHandler.setGroupDriveId(groupDriveId, groupNumber);
+                        groupNumber = null;
+                    } else {
+                        Log.i(TAG, "onResult: DB can't be updated with the drive id.");
+                    }
+                }
+            };
+    final ResultCallback<DriveApi.DriveContentsResult> driveContentsCallback =
+            new ResultCallback<DriveApi.DriveContentsResult>() {
+                @Override
+                public void onResult(@NonNull DriveApi.DriveContentsResult result) {
+                    if (!result.getStatus().isSuccess()) {
+                        Toast.makeText(getContext(), "Error while trying to create new file contents", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    final DriveContents driveContents = result.getDriveContents();
+
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            // write content to DriveContents
+                            OutputStream outputStream = driveContents.getOutputStream();
+                            Writer writer = new OutputStreamWriter(outputStream);
+                            try {
+                                writer.write("Activity for group " + groupNumber + "\n");
+                                writer.close();
+                            } catch (IOException e) {
+                                Log.e(TAG, e.getMessage());
+                            }
+
+                            MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                                    .setTitle("Group " + groupNumber)
+                                    .setMimeType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                                    .setStarred(true).build();
+
+                            // create a file on root folder
+                            Drive.DriveApi.getRootFolder(mGoogleApiClient)
+                                    .createFile(mGoogleApiClient, changeSet, driveContents)
+                                    .setResultCallback(fileCallback);
+                        }
+                    }.start();
+                }
+            };
 
     public MainFragment() {
     }
@@ -96,7 +158,18 @@ public class MainFragment extends Fragment {
 
     public void addNewGroup(Group group) {
         mGroups.add(group);
+        groupNumber = group.getNumber();
         mGridAdapter.notifyDataSetChanged();
+        createFileInDrive();
+    }
+
+    public GoogleApiClient getGoogleApiClient() {
+        if (mGoogleApiClient != null) {
+            return mGoogleApiClient;
+        } else {
+            Log.i(TAG, "getGoogleApiClient: mGoogleApiClient is null");
+            return null;
+        }
     }
 
     public void setGoogleApiClient(GoogleApiClient mGoogleApiClient) {
@@ -104,31 +177,11 @@ public class MainFragment extends Fragment {
         this.mGoogleApiClient = mGoogleApiClient;
     }
 
-    public void createFileInDrive() {
+    private void createFileInDrive() {
         if (mGoogleApiClient.isConnected()) {
-            //Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(driveContentsCallback);
+            Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(driveContentsCallback);
         } else {
             Log.i(TAG, "createFileInDrive: client isn't connected. Can't create drive file.");
         }
     }
-
-    final ResultCallback<DriveApi.DriveContentsResult> driveContentsCallback =
-            new ResultCallback<DriveApi.DriveContentsResult>() {
-                @Override
-                public void onResult(@NonNull DriveApi.DriveContentsResult result) {
-                    MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
-                            .setMimeType("text/html").build();
-                    IntentSender intentSender = Drive.DriveApi
-                            .newCreateFileActivityBuilder()
-                            .setInitialMetadata(metadataChangeSet)
-                            .setInitialDriveContents(result.getDriveContents())
-                            .build(mGoogleApiClient);
-//                    try {
-//                        startIntentSenderForResult(
-//                                intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
-//                    } catch (IntentSender.SendIntentException e) {
-//                        Log.w(TAG, "Unable to send intent", e);
-//                    }
-                }
-            };
 }

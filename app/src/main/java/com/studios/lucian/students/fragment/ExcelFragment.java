@@ -180,7 +180,6 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
     private void redirectToMainFragment(Group group) {
         MainFragment mainFragment = ((MainActivity) getActivity()).getMainFragment();
         mainFragment.addNewGroup(group);
-        mainFragment.createFileInDrive();
         getFragmentManager().beginTransaction().replace(R.id.main_content, mainFragment).commit();
     }
 
