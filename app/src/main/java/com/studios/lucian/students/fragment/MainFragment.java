@@ -35,7 +35,11 @@ import java.util.List;
 /**
  * Created with Love by Lucian and Pi on 21.02.2016.
  */
-public class MainFragment extends Fragment {
+public class MainFragment
+        extends Fragment
+        implements ResultCallback<DriveApi.DriveContentsResult>,
+        AdapterView.OnItemClickListener {
+
     private static final String TAG = MainFragment.class.getSimpleName();
 
     private GridView mGridView;
@@ -61,43 +65,6 @@ public class MainFragment extends Fragment {
                     } else {
                         Log.i(TAG, "onResult: DB can't be updated with the drive id.");
                     }
-                }
-            };
-    final ResultCallback<DriveApi.DriveContentsResult> driveContentsCallback =
-            new ResultCallback<DriveApi.DriveContentsResult>() {
-                @Override
-                public void onResult(@NonNull DriveApi.DriveContentsResult result) {
-                    if (!result.getStatus().isSuccess()) {
-                        Toast.makeText(getContext(), "Error while trying to create new file contents", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    final DriveContents driveContents = result.getDriveContents();
-
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            // write content to DriveContents
-                            OutputStream outputStream = driveContents.getOutputStream();
-                            Writer writer = new OutputStreamWriter(outputStream);
-                            try {
-                                writer.write("Activity for group " + groupNumber + "\n");
-                                writer.close();
-                            } catch (IOException e) {
-                                Log.e(TAG, e.getMessage());
-                            }
-
-                            MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                                    .setTitle("Group " + groupNumber)
-                                    .setMimeType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                                    .setStarred(true).build();
-
-                            // create a file on root folder
-                            Drive.DriveApi.getRootFolder(mGoogleApiClient)
-                                    .createFile(mGoogleApiClient, changeSet, driveContents)
-                                    .setResultCallback(fileCallback);
-                        }
-                    }.start();
                 }
             };
 
@@ -128,7 +95,7 @@ public class MainFragment extends Fragment {
         mGridAdapter = new GridAdapter(getContext(), mGroups);
         mGridView.setAdapter(mGridAdapter);
         mGridView.setEmptyView(mTextViewEmpty);
-        setGridViewClickListener();
+        mGridView.setOnItemClickListener(this);
     }
 
     @Override
@@ -137,23 +104,19 @@ public class MainFragment extends Fragment {
         getActivity().setTitle(R.string.dashboard);
     }
 
-    private void setGridViewClickListener() {
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Group selectedGroup = (Group) adapterView.getItemAtPosition(i);
-                GroupDetailFragment groupDetailFragment = new GroupDetailFragment();
-                Bundle args = new Bundle();
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Group selectedGroup = (Group) adapterView.getItemAtPosition(i);
+        GroupDetailFragment groupDetailFragment = new GroupDetailFragment();
+        Bundle args = new Bundle();
 
-                args.putString("groupNumber", selectedGroup.getNumber());
-                groupDetailFragment.setArguments(args);
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.main_content, groupDetailFragment, "detail")
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
+        args.putString("groupNumber", selectedGroup.getNumber());
+        groupDetailFragment.setArguments(args);
+        getFragmentManager().beginTransaction()
+                .replace(R.id.main_content, groupDetailFragment, "detail")
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
+                .commit();
     }
 
     public void addNewGroup(Group group) {
@@ -179,9 +142,47 @@ public class MainFragment extends Fragment {
 
     private void createFileInDrive() {
         if (mGoogleApiClient.isConnected()) {
-            Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(driveContentsCallback);
+            Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(this);
         } else {
             Log.i(TAG, "createFileInDrive: client isn't connected. Can't create drive file.");
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Create File in Drive CallBack
+    ///////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
+        if (!driveContentsResult.getStatus().isSuccess()) {
+            Toast.makeText(getContext(), "Error while trying to create new file contents", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final DriveContents driveContents = driveContentsResult.getDriveContents();
+
+        new Thread() {
+            @Override
+            public void run() {
+                // write content to DriveContents
+                OutputStream outputStream = driveContents.getOutputStream();
+                Writer writer = new OutputStreamWriter(outputStream);
+                try {
+                    writer.write("Activity for group " + groupNumber + "\n");
+                    writer.close();
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
+                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                        .setTitle("Group " + groupNumber)
+                        .setMimeType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                        .setStarred(true)
+                        .build();
+
+                Drive.DriveApi.getRootFolder(mGoogleApiClient)
+                        .createFile(mGoogleApiClient, changeSet, driveContents)
+                        .setResultCallback(fileCallback);
+            }
+        }.start();
     }
 }

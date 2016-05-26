@@ -24,21 +24,20 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveId;
-import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.fragment.CsvFragment;
 import com.studios.lucian.students.fragment.ExcelFragment;
 import com.studios.lucian.students.fragment.MainFragment;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity
+        extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
+
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CODE_RESOLUTION = 3;
     private static final int REQUEST_CODE_CREATOR = 1;
@@ -115,6 +114,8 @@ public class MainActivity extends AppCompatActivity
                 if (resultCode == RESULT_OK) {
                     DriveId driveId = data.getParcelableExtra(OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
                     Toast.makeText(MainActivity.this, "File created with ID: " + driveId, Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.i(TAG, "onActivityResult: " + resultCode);
                 }
                 finish();
                 break;
@@ -302,6 +303,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.i(TAG, "API client connected.");
+//        Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(driveContentsCallback);
         setGoogleApiClientToFragment();
     }
 
@@ -324,30 +326,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    final ResultCallback<DriveApi.DriveContentsResult> driveContentsCallback =
-            new ResultCallback<DriveApi.DriveContentsResult>() {
-                @Override
-                public void onResult(@NonNull DriveApi.DriveContentsResult result) {
-                    MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
-                            .setMimeType("text/html").build();
-                    IntentSender intentSender = Drive.DriveApi
-                            .newCreateFileActivityBuilder()
-                            .setInitialMetadata(metadataChangeSet)
-                            .setInitialDriveContents(result.getDriveContents())
-                            .build(mGoogleApiClient);
-                    try {
-                        startIntentSenderForResult(
-                                intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
-                    } catch (IntentSender.SendIntentException e) {
-                        Log.w(TAG, "Unable to send intent", e);
-                    }
-                }
-            };
-
-    public MainFragment getMainFragment() {
-        return mMainFragment;
-    }
-
     private void setGoogleApiClientToFragment() {
         try {
             mMainFragment.setGoogleApiClient(mGoogleApiClient);
@@ -355,4 +333,27 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "setGoogleApiClientToFragment: mGoogleApiClient is null");
         }
     }
+
+    public MainFragment getMainFragment() {
+        return mMainFragment;
+    }
 }
+
+//    final ResultCallback<DriveApi.DriveContentsResult> driveContentsCallback =
+//            new ResultCallback<DriveApi.DriveContentsResult>() {
+//                @Override
+//                public void onResult(@NonNull DriveApi.DriveContentsResult result) {
+//                    MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
+//                            .setMimeType("application/vnd.google-apps.ritz").build();
+//                    IntentSender intentSender = Drive.DriveApi
+//                            .newCreateFileActivityBuilder()
+//                            .setInitialMetadata(metadataChangeSet)
+//                            .setInitialDriveContents(result.getDriveContents())
+//                            .build(mGoogleApiClient);
+//                    try {
+//                        startIntentSenderForResult(intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
+//                    } catch (IntentSender.SendIntentException e) {
+//                        Log.w(TAG, "Unable to send intent", e);
+//                    }
+//                }
+//            };

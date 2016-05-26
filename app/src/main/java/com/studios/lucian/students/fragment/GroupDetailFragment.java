@@ -29,11 +29,16 @@ import com.studios.lucian.students.util.Validator;
 
 import java.util.List;
 
-public class GroupDetailFragment extends ListFragment {
+public class GroupDetailFragment
+        extends ListFragment
+        implements View.OnClickListener,
+        AdapterView.OnItemClickListener {
+
     private static final String TAG = GroupDetailFragment.class.getSimpleName();
     private static final String GROUP = "Group ";
     private static final String KEY_MATRICOL = "matricol";
     private final String EMPTY_SPACE = " ";
+
     private FloatingActionButton mFloatingActionButton;
     private TextView emptyText;
     private StudentsDbHandler mStudentsDbHandler;
@@ -47,11 +52,8 @@ public class GroupDetailFragment extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.i(TAG, "onCreateView");
         Bundle bundle = this.getArguments();
         mGroupNumber = bundle.getString("groupNumber");
-        Log.i(TAG, "backStackCount = " + getFragmentManager().getBackStackEntryCount());
-
         mStudentsDbHandler = new StudentsDbHandler(getActivity());
         return inflater.inflate(R.layout.fragment_home_group_detail, container, false);
     }
@@ -59,24 +61,13 @@ public class GroupDetailFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.i(TAG, "onViewCreated");
-        mFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.fab);
-        emptyText = (TextView) view.findViewById(android.R.id.empty);
-        setButtonClickListener();
-        setListClickListener();
-        setAdapter();
-    }
 
-    private void setListClickListener() {
-        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Student student = (Student) getListView().getItemAtPosition(i);
-                Intent intent = new Intent(getActivity(), DisplayStudentActivity.class);
-                intent.putExtra(KEY_MATRICOL, student.getMatricol());
-                startActivity(intent);
-            }
-        });
+        emptyText = (TextView) view.findViewById(android.R.id.empty);
+        mFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.fab);
+        mFloatingActionButton.setOnClickListener(this);
+
+        getListView().setOnItemClickListener(this);
+        setAdapter();
     }
 
     @Override
@@ -88,7 +79,6 @@ public class GroupDetailFragment extends ListFragment {
 
     @Override
     public void onResume() {
-        Log.i(TAG, "onResume");
         super.onResume();
         registerForContextMenu(getListView());
     }
@@ -97,7 +87,6 @@ public class GroupDetailFragment extends ListFragment {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getActivity().getMenuInflater();
-//        menu.setHeaderTitle(((TextView) ((AdapterView.AdapterContextMenuInfo) menuInfo).targetView).getText());
         inflater.inflate(R.menu.context_menu, menu);
     }
 
@@ -208,59 +197,6 @@ public class GroupDetailFragment extends ListFragment {
         setListAdapter(listAdapter);
     }
 
-    private void setButtonClickListener() {
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-                final LayoutInflater inflater = getActivity().getLayoutInflater();
-                final View alertView = inflater.inflate(R.layout.dialog_add_student, null);
-
-                TextView dialogGroupNumber = (TextView) alertView.findViewById(R.id.dialog_group_number);
-                final EditText dialogMatricol = (EditText) alertView.findViewById(R.id.dialog_student_id);
-                final EditText dialogName = (EditText) alertView.findViewById(R.id.dialog_name);
-                final EditText dialogSurname = (EditText) alertView.findViewById(R.id.dialog_surname);
-                dialogGroupNumber.setText(getDialogGroupNumberText());
-
-                dialog.setView(alertView)
-                        .setPositiveButton(R.string.button_add_student, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                boolean inputsAreOk = true;
-                                if (!Validator.isValidMatricol(dialogMatricol.getText().toString())) {
-                                    inputsAreOk = false;
-                                    dialogMatricol.setError("Invalid Student ID");
-                                }
-                                if (!Validator.isValidName(dialogName.getText().toString())) {
-                                    inputsAreOk = false;
-                                    dialogName.setError("Invalid Name");
-                                }
-                                if (!Validator.isValidName(dialogSurname.getText().toString())) {
-                                    inputsAreOk = false;
-                                    dialogSurname.setError("Invalid Surname");
-                                }
-                                if (inputsAreOk) {
-                                    addNewStudent(
-                                            dialogMatricol.getText().toString(),
-                                            dialogName.getText().toString(),
-                                            dialogSurname.getText().toString());
-                                } else {
-                                    showWarning(R.string.error_add_student_title, R.string.error_add_student_message);
-                                }
-                            }
-                        })
-                        .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        })
-                        .create()
-                        .show();
-            }
-        });
-    }
-
     private void showWarning(int errorTitle, int errorMessage) {
         new AlertDialog
                 .Builder(getContext())
@@ -279,5 +215,62 @@ public class GroupDetailFragment extends ListFragment {
 
     private String getDialogGroupNumberText() {
         return getString(R.string.dialog_group_number) + EMPTY_SPACE + mGroupNumber;
+    }
+
+    @Override
+    public void onClick(View view) {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        final LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View alertView = inflater.inflate(R.layout.dialog_add_student, null);
+
+        TextView dialogGroupNumber = (TextView) alertView.findViewById(R.id.dialog_group_number);
+        final EditText dialogMatricol = (EditText) alertView.findViewById(R.id.dialog_student_id);
+        final EditText dialogName = (EditText) alertView.findViewById(R.id.dialog_name);
+        final EditText dialogSurname = (EditText) alertView.findViewById(R.id.dialog_surname);
+        dialogGroupNumber.setText(getDialogGroupNumberText());
+
+        dialog.setView(alertView)
+                .setPositiveButton(R.string.button_add_student, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        boolean inputsAreOk = true;
+                        if (!Validator.isValidMatricol(dialogMatricol.getText().toString())) {
+                            inputsAreOk = false;
+                            dialogMatricol.setError("Invalid Student ID");
+                        }
+                        if (!Validator.isValidName(dialogName.getText().toString())) {
+                            inputsAreOk = false;
+                            dialogName.setError("Invalid Name");
+                        }
+                        if (!Validator.isValidName(dialogSurname.getText().toString())) {
+                            inputsAreOk = false;
+                            dialogSurname.setError("Invalid Surname");
+                        }
+                        if (inputsAreOk) {
+                            addNewStudent(
+                                    dialogMatricol.getText().toString(),
+                                    dialogName.getText().toString(),
+                                    dialogSurname.getText().toString());
+                        } else {
+                            showWarning(R.string.error_add_student_title, R.string.error_add_student_message);
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Student student = (Student) getListView().getItemAtPosition(i);
+        Intent intent = new Intent(getActivity(), DisplayStudentActivity.class);
+        intent.putExtra(KEY_MATRICOL, student.getMatricol());
+        startActivity(intent);
     }
 }

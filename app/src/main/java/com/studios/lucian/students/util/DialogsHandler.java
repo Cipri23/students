@@ -53,31 +53,21 @@ public class DialogsHandler {
     }
 
     public static void showWrongGroupNumber(String mGroupNumber, Context context) {
-        android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(context);
-        dialogBuilder.setTitle(DIALOG_TITLE);
-        dialogBuilder.setMessage(DIALOG_MESSAGE + mGroupNumber + DIALOG_MESSAGE_CONT);
-
-        dialogBuilder.setPositiveButton("Got it", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-            }
-        });
-
-        final android.support.v7.app.AlertDialog dialog = dialogBuilder.create();
-        dialog.show();
+        new android.support.v7.app.AlertDialog.Builder(context)
+                .setTitle(DIALOG_TITLE)
+                .setMessage(DIALOG_MESSAGE + mGroupNumber + DIALOG_MESSAGE_CONT)
+                .setPositiveButton("Got it", null)
+                .create()
+                .show();
     }
 
     public static void showErrorMessage(String message, Context context) {
-        android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(context);
-        dialogBuilder.setTitle(ERROR);
-        dialogBuilder.setMessage(message);
-        dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-            }
-        });
-        final android.support.v7.app.AlertDialog dialog = dialogBuilder.create();
-        dialog.show();
+        new android.support.v7.app.AlertDialog.Builder(context)
+                .setTitle(ERROR)
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .create()
+                .show();
     }
 
     public void showAddGradeDialog(final Student student) {
