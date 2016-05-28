@@ -29,12 +29,12 @@ import com.studios.lucian.students.util.Validator;
 
 import java.util.List;
 
-public class GroupDetailFragment
+public class GroupFragment
         extends ListFragment
         implements View.OnClickListener,
         AdapterView.OnItemClickListener {
 
-    private static final String TAG = GroupDetailFragment.class.getSimpleName();
+    private static final String TAG = GroupFragment.class.getSimpleName();
     private static final String GROUP = "Group ";
     private static final String KEY_MATRICOL = "matricol";
     private final String EMPTY_SPACE = " ";
@@ -46,7 +46,7 @@ public class GroupDetailFragment
     private String mGroupNumber;
     private List<Student> mStudentsList;
 
-    public GroupDetailFragment() {
+    public GroupFragment() {
         Log.i(TAG, "GroupFragment");
     }
 
@@ -55,7 +55,7 @@ public class GroupDetailFragment
         Bundle bundle = this.getArguments();
         mGroupNumber = bundle.getString("groupNumber");
         mStudentsDbHandler = new StudentsDbHandler(getActivity());
-        return inflater.inflate(R.layout.fragment_home_group_detail, container, false);
+        return inflater.inflate(R.layout.fragment_group, container, false);
     }
 
     @Override

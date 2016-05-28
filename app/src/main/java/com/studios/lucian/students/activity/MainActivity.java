@@ -93,7 +93,6 @@ public class MainActivity
 
     @Override
     protected void onStart() {
-        Log.i(TAG, "onStart: trying to connect");
         super.onStart();
         mGoogleApiClient.connect();
     }
@@ -106,7 +105,6 @@ public class MainActivity
                     if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
                         Log.i(TAG, "onActivityResult: connecting client...");
                         mGoogleApiClient.connect();
-
                     }
                 }
                 break;
@@ -127,7 +125,6 @@ public class MainActivity
 
     @Override
     public void onBackPressed() {
-        Log.i(TAG, "onBackPressed");
         try {
             mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
             if (mDrawerLayout != null) {
@@ -169,23 +166,14 @@ public class MainActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.students, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -263,19 +251,16 @@ public class MainActivity
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_STORAGE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay!
                     if (USER_OPTION == R.id.nav_excel_file) switchToExcelFragment();
                     if (USER_OPTION == R.id.nav_csv_file) switchToCsvFragment();
                 } else {
                     Log.i(TAG, "onRequestPermissionsResult: permission was denied");
-                    // permission denied, boo!
                 }
             }
         }
     }
 
     private boolean appHasPermission() {
-        Log.i(TAG, "appHasPermission: called");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                     this,

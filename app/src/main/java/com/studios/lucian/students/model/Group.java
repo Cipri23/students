@@ -14,7 +14,7 @@ public class Group {
 
     @Override
     public String toString() {
-        return "Group: " + number + "\nCount: " + studentCount;
+        return "Group: " + number + "\nStudents: " + studentCount;
     }
 
     @Override

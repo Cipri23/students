@@ -15,12 +15,12 @@ import java.util.List;
 /**
  * Created with Love by Lucian and Pi on 15.03.2016.
  */
-public class GridAdapter extends BaseAdapter {
+public class GroupsGridAdapter extends BaseAdapter {
 
     private final List<Group> mGroups;
     private final Context mContext;
 
-    public GridAdapter(Context context, List<Group> groups) {
+    public GroupsGridAdapter(Context context, List<Group> groups) {
         mContext = context;
         mGroups = groups;
     }
@@ -42,7 +42,6 @@ public class GridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View gridView;
         if (view == null) {

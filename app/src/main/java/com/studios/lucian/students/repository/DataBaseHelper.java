@@ -51,7 +51,6 @@ class DataBaseHelper extends SQLiteOpenHelper {
 
     DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        Log.i(TAG, "DataBaseHelper");
     }
 
     @Override

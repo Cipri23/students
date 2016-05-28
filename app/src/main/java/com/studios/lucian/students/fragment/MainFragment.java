@@ -22,7 +22,7 @@ import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.studios.lucian.students.R;
-import com.studios.lucian.students.adapter.GridAdapter;
+import com.studios.lucian.students.adapter.GroupsGridAdapter;
 import com.studios.lucian.students.model.Group;
 import com.studios.lucian.students.util.StudentsDbHandler;
 
@@ -44,11 +44,12 @@ public class MainFragment
 
     private GridView mGridView;
     private TextView mTextViewEmpty;
-    private GridAdapter mGridAdapter;
+    private GroupsGridAdapter mGroupsGridAdapter;
     private StudentsDbHandler mStudentsDbHandler;
     private List<Group> mGroups;
     private GoogleApiClient mGoogleApiClient;
     private String groupNumber = null;
+
     final private ResultCallback<DriveFolder.DriveFileResult> fileCallback = new
             ResultCallback<DriveFolder.DriveFileResult>() {
                 @Override
@@ -73,7 +74,6 @@ public class MainFragment
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         mStudentsDbHandler = new StudentsDbHandler(getContext());
         mGroups = mStudentsDbHandler.getUniqueGroups();
@@ -82,7 +82,6 @@ public class MainFragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.i(TAG, "onCreateView");
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -92,8 +91,8 @@ public class MainFragment
         mGridView = (GridView) view.findViewById(R.id.gridview);
         mTextViewEmpty = (TextView) view.findViewById(android.R.id.empty);
 
-        mGridAdapter = new GridAdapter(getContext(), mGroups);
-        mGridView.setAdapter(mGridAdapter);
+        mGroupsGridAdapter = new GroupsGridAdapter(getContext(), mGroups);
+        mGridView.setAdapter(mGroupsGridAdapter);
         mGridView.setEmptyView(mTextViewEmpty);
         mGridView.setOnItemClickListener(this);
     }
@@ -107,13 +106,13 @@ public class MainFragment
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Group selectedGroup = (Group) adapterView.getItemAtPosition(i);
-        GroupDetailFragment groupDetailFragment = new GroupDetailFragment();
+        GroupFragment groupFragment = new GroupFragment();
         Bundle args = new Bundle();
 
         args.putString("groupNumber", selectedGroup.getNumber());
-        groupDetailFragment.setArguments(args);
+        groupFragment.setArguments(args);
         getFragmentManager().beginTransaction()
-                .replace(R.id.main_content, groupDetailFragment, "detail")
+                .replace(R.id.main_content, groupFragment, "detail")
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack(null)
                 .commit();
@@ -122,7 +121,7 @@ public class MainFragment
     public void addNewGroup(Group group) {
         mGroups.add(group);
         groupNumber = group.getNumber();
-        mGridAdapter.notifyDataSetChanged();
+        mGroupsGridAdapter.notifyDataSetChanged();
         createFileInDrive();
     }
 

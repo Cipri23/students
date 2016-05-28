@@ -28,7 +28,7 @@ public class DisplayStudentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_selected_student);
+        setContentView(R.layout.activity_display_student);
 
         mListView = (ListView) findViewById(android.R.id.list);
         mEmptyText = (TextView) findViewById(android.R.id.empty);
