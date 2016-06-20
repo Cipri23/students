@@ -20,12 +20,10 @@ import android.widget.Toast;
 
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.activity.MainActivity;
-import com.studios.lucian.students.model.Group;
-import com.studios.lucian.students.model.Student;
+import com.studios.lucian.students.repository.GroupDAO;
 import com.studios.lucian.students.util.DialogsHandler;
 import com.studios.lucian.students.util.StudentsDbHandler;
 import com.studios.lucian.students.util.Validator;
-import com.studios.lucian.students.util.parser.ExcelParser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,7 +58,6 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate");
         return inflater.inflate(R.layout.fragment_excel, container, false);
     }
 
@@ -72,7 +69,6 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.d(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         mStudentsDbHandler = new StudentsDbHandler(getActivity());
         getListView().setOnItemClickListener(this);
@@ -80,6 +76,7 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
     }
 
     private void getDirectories(String dirPath) {
+        Log.i(TAG, "getDirectories: entered");
         mTextViewPath.setText(String.format("%s%s", getString(R.string.location), dirPath));
         List<String> item = new ArrayList<>();
         mPath = new ArrayList<>();
@@ -104,7 +101,9 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
                 }
             }
         }
-        ArrayAdapter<String> fileList = new ArrayAdapter<>(this.getActivity(), R.layout.item_explorer, item);
+//        FileExplorerAdapter fileExplorerAdapter = new FileExplorerAdapter(getContext(), item, mPath);
+        ArrayAdapter<String> fileList =
+                new ArrayAdapter<>(this.getActivity(), R.layout.item_explorer_test, item);
         setListAdapter(fileList);
     }
 
@@ -116,10 +115,14 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
             if (file.canRead()) {
                 getDirectories(mPath.get(position));
             } else {
-                new AlertDialog.Builder(this.getActivity()).setTitle("[" + file.getName() + "] folder can't be read!").setPositiveButton("OK", null).show();
+                new AlertDialog.Builder(this.getActivity())
+                        .setTitle("[" + file.getName() + "] folder can't be read!")
+                        .setPositiveButton("OK", null)
+                        .show();
             }
         } else {
-            String fileExtension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(DOT));
+            String fileExtension = file.getAbsolutePath()
+                    .substring(file.getAbsolutePath().lastIndexOf(DOT));
             switch (fileExtension) {
                 case XLS:
                     dialogBoxSelectionGroupNumber(file);
@@ -128,70 +131,54 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
                     Toast.makeText(getContext(), NOT_IMPLEMENTED_YET, Toast.LENGTH_LONG).show();
                     break;
                 default:
-                    Toast.makeText(getContext(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG)
+                            .show();
                     break;
             }
         }
     }
 
     private void dialogBoxSelectionGroupNumber(final File file) {
-        android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(getContext());
-
-        dialogBuilder.setTitle(DIALOG_TITLE);
-        dialogBuilder.setMessage(DIALOG_MESSAGE);
 
         final EditText input = new EditText(getContext());
         input.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        dialogBuilder.setView(input);
 
-        dialogBuilder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String userInput = input.getText().toString();
-                if (Validator.isValidGroupNumber(userInput)) {
-                    handleXlsFile(file, userInput);
-                } else {
-                    DialogsHandler.showWrongGroupNumber(userInput, getContext());
-                }
-            }
-        });
-        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-            }
-        });
+        new AlertDialog.Builder(getContext())
+                .setTitle(DIALOG_TITLE)
+                .setMessage(DIALOG_MESSAGE)
+                .setView(input)
+                .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String userInput = input.getText().toString();
+                        if (Validator.isValidGroupNumber(userInput) && !groupExists(userInput)) {
+                            handleXlsFile(file, userInput);
+                        } else {
+                            DialogsHandler.showWrongGroupNumber(userInput, getContext());
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                })
+                .create()
+                .show();
+    }
 
-        final android.support.v7.app.AlertDialog dialog = dialogBuilder.create();
-        dialog.show();
+    private boolean groupExists(String userInput) {
+        GroupDAO groupDAO = new GroupDAO(getActivity());
+        return groupDAO.find(userInput);
     }
 
     private void handleXlsFile(File file, String groupNumber) {
-        try {
-            int studentsCount = insertRecords(file, groupNumber);
-            Group group = new Group(groupNumber, studentsCount);
-            redirectToMainFragment(group);
-            setNavDrawerItemAsChecked();
-        } catch (Exception e) {
-            DialogsHandler.showErrorMessage(e.getMessage(), getContext());
-        }
-    }
-
-    private void redirectToMainFragment(Group group) {
         MainFragment mainFragment = ((MainActivity) getActivity()).getMainFragment();
-        mainFragment.addNewGroup(group);
-        getFragmentManager().beginTransaction().replace(R.id.main_content, mainFragment).commit();
-    }
+        mainFragment.addNewGroup(file, groupNumber);
 
-    private int insertRecords(File fileName, String groupNumber) throws Exception {
-        try {
-            ExcelParser excelParser = new ExcelParser(groupNumber, fileName.getAbsolutePath());
-            List<Student> studentList = excelParser.parseFile();
-            mStudentsDbHandler.insertStudents(studentList);
-            return studentList.size();
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
+        getFragmentManager().beginTransaction().replace(R.id.main_content, mainFragment).commit();
+        setNavDrawerItemAsChecked();
     }
 
     private void setNavDrawerItemAsChecked() {

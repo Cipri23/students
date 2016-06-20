@@ -2,8 +2,8 @@ package com.studios.lucian.students.fragment;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,62 +12,37 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveApi;
-import com.google.android.gms.drive.DriveContents;
-import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.MetadataChangeSet;
+import com.google.android.gms.drive.DriveId;
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.adapter.GroupsGridAdapter;
 import com.studios.lucian.students.model.Group;
+import com.studios.lucian.students.model.Student;
+import com.studios.lucian.students.repository.GroupDAO;
+import com.studios.lucian.students.sync.DriveSyncHandler;
+import com.studios.lucian.students.util.DriveFileCallBackListener;
 import com.studios.lucian.students.util.StudentsDbHandler;
+import com.studios.lucian.students.util.parser.ExcelParser;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.File;
 import java.util.List;
 
 /**
  * Created with Love by Lucian and Pi on 21.02.2016.
  */
-public class MainFragment
-        extends Fragment
-        implements ResultCallback<DriveApi.DriveContentsResult>,
-        AdapterView.OnItemClickListener {
+public class MainFragment extends Fragment implements AdapterView.OnItemClickListener, DriveFileCallBackListener {
 
     private static final String TAG = MainFragment.class.getSimpleName();
-
     private GridView mGridView;
     private TextView mTextViewEmpty;
     private GroupsGridAdapter mGroupsGridAdapter;
     private StudentsDbHandler mStudentsDbHandler;
+    private DriveSyncHandler mDriveSyncHandler;
     private List<Group> mGroups;
     private GoogleApiClient mGoogleApiClient;
     private String groupNumber = null;
-
-    final private ResultCallback<DriveFolder.DriveFileResult> fileCallback = new
-            ResultCallback<DriveFolder.DriveFileResult>() {
-                @Override
-                public void onResult(@NonNull DriveFolder.DriveFileResult result) {
-                    if (!result.getStatus().isSuccess()) {
-                        Toast.makeText(getContext(), "Error while trying to create the file", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    Log.i(TAG, "onResult: file created with id: " + result.getDriveFile().getDriveId());
-                    String groupDriveId = result.getDriveFile().getDriveId().encodeToString();
-                    if (groupNumber != null) {
-                        mStudentsDbHandler.setGroupDriveId(groupDriveId, groupNumber);
-                        groupNumber = null;
-                    } else {
-                        Log.i(TAG, "onResult: DB can't be updated with the drive id.");
-                    }
-                }
-            };
+    private GroupDAO mGroupDao;
 
     public MainFragment() {
     }
@@ -76,12 +51,14 @@ public class MainFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mStudentsDbHandler = new StudentsDbHandler(getContext());
-        mGroups = mStudentsDbHandler.getUniqueGroups();
+        mGroupDao = new GroupDAO(getActivity());
+        mGroups = mGroupDao.getAll();
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -118,11 +95,14 @@ public class MainFragment
                 .commit();
     }
 
-    public void addNewGroup(Group group) {
+    public boolean addNewGroup(Group group) {
         mGroups.add(group);
         groupNumber = group.getNumber();
         mGroupsGridAdapter.notifyDataSetChanged();
-        createFileInDrive();
+        if (mDriveSyncHandler != null) {
+            mDriveSyncHandler.syncNewFile(groupNumber);
+        }
+        return false;
     }
 
     public GoogleApiClient getGoogleApiClient() {
@@ -134,54 +114,47 @@ public class MainFragment
         }
     }
 
-    public void setGoogleApiClient(GoogleApiClient mGoogleApiClient) {
+    public void setGoogleApiClient(GoogleApiClient googleApiClient) {
+        this.mGoogleApiClient = googleApiClient;
         Log.i(TAG, "setGoogleApiClient: " + mGoogleApiClient.isConnected());
-        this.mGoogleApiClient = mGoogleApiClient;
+        this.mDriveSyncHandler = new DriveSyncHandler(googleApiClient, this);
     }
 
-    private void createFileInDrive() {
-        if (mGoogleApiClient.isConnected()) {
-            Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(this);
-        } else {
-            Log.i(TAG, "createFileInDrive: client isn't connected. Can't create drive file.");
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Create File in Drive CallBack
-    ///////////////////////////////////////////////////////////////////////////
     @Override
-    public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
-        if (!driveContentsResult.getStatus().isSuccess()) {
-            Toast.makeText(getContext(), "Error while trying to create new file contents", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    public void setDriveFileId(String groupNumber, DriveId driveId) {
+        mGroupDao.setDriveId(groupNumber, driveId.encodeToString());
+        syncGroups();
+    }
 
-        final DriveContents driveContents = driveContentsResult.getDriveContents();
+    public void addNewGroup(File file, final String groupNumber) {
+        final ExcelParser excelParser = new ExcelParser(groupNumber, file.getAbsolutePath());
 
-        new Thread() {
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            public void run() {
-                // write content to DriveContents
-                OutputStream outputStream = driveContents.getOutputStream();
-                Writer writer = new OutputStreamWriter(outputStream);
-                try {
-                    writer.write("Activity for group " + groupNumber + "\n");
-                    writer.close();
-                } catch (IOException e) {
-                    Log.e(TAG, e.getMessage());
+            protected Void doInBackground(Void... voids) {
+                List<Student> studentList = excelParser.parseFile();
+                Group group = new Group(groupNumber, studentList.size());
+                if (mGroupDao.add(group)) {
+                    mStudentsDbHandler.insertStudents(studentList);
+                } else {
+                    Log.i(TAG, "doInBackground: errrrrrrrrrrrrrrrrrrrrr");
                 }
-
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                        .setTitle("Group " + groupNumber)
-                        .setMimeType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                        .setStarred(true)
-                        .build();
-
-                Drive.DriveApi.getRootFolder(mGoogleApiClient)
-                        .createFile(mGoogleApiClient, changeSet, driveContents)
-                        .setResultCallback(fileCallback);
+                return null;
             }
-        }.start();
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                if (mDriveSyncHandler != null) {
+                    mDriveSyncHandler.syncNewFile(groupNumber);
+                }
+                syncGroups();
+            }
+        }.execute();
+    }
+
+    public void syncGroups() {
+        mGroups = mGroupDao.getAll();
+        mGroupsGridAdapter.setData(mGroups);
     }
 }

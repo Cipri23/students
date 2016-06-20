@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
@@ -10,11 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
+        android:gravity="center"
         android:padding="7dp"
-        android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
-        tools:targetApi="jelly_bean_mr1" />
+        android:textSize="20sp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -33,9 +31,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/grade"
-                android:textAlignment="center"
-                tools:targetApi="jelly_bean_mr1" />
+                android:gravity="center"
+                android:text="@string/grade" />
 
             <NumberPicker
                 android:id="@+id/numberPickerGrade"
@@ -54,9 +51,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/lab_no"
-                android:textAlignment="center"
-                tools:targetApi="jelly_bean_mr1" />
+                android:gravity="center"
+                android:text="@string/lab_no" />
 
             <NumberPicker
                 android:id="@+id/numberPickerLab"

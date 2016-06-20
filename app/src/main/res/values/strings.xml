@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Students</string>
+    <string name="app_name">Student Management App</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -49,5 +49,11 @@
     <string name="homework_number">Homework number: </string>
     <string name="date">Date:</string>
     <string name="grade_display">Grade:</string>
+    <string name="professor_name">Professor name</string>
+    <string name="name_surname_cs_ubbcluj_ro">name.surname@cs.ubbcluj.ro</string>
+    <string name="presence">+PRESENCE</string>
+    <string name="button_add_presence">add presence</string>
+    <string name="course_number">Course Number</string>
+    <string name="error">Some error occurred due the drive syncing</string>
 
 </resources>

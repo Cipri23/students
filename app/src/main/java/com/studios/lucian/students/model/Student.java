@@ -8,19 +8,12 @@ public class Student {
     private String groupNumber;
     private String name;
     private String surname;
-    private String driveFileId;
 
-    public Student(String groupNumber, String matricol, String name, String surname, String driveFileId) {
+    public Student(String groupNumber, String matricol, String name, String surname) {
         this.matricol = matricol;
         this.groupNumber = groupNumber;
         this.name = name;
         this.surname = surname;
-        this.driveFileId = driveFileId;
-    }
-
-    @Override
-    public String toString() {
-        return name + " " + surname;
     }
 
     @Override
@@ -30,7 +23,12 @@ public class Student {
 
         Student student = (Student) o;
 
-        return matricol != null ? matricol.equals(student.matricol) : student.matricol == null && (groupNumber != null ? groupNumber.equals(student.groupNumber) : student.groupNumber == null && (name != null ? name.equals(student.name) : student.name == null && (surname != null ? surname.equals(student.surname) : student.surname == null && (driveFileId != null ? driveFileId.equals(student.driveFileId) : student.driveFileId == null))));
+        if (matricol != null ? !matricol.equals(student.matricol) : student.matricol != null)
+            return false;
+        if (groupNumber != null ? !groupNumber.equals(student.groupNumber) : student.groupNumber != null)
+            return false;
+        if (name != null ? !name.equals(student.name) : student.name != null) return false;
+        return surname != null ? surname.equals(student.surname) : student.surname == null;
 
     }
 
@@ -40,12 +38,15 @@ public class Student {
         result = 31 * result + (groupNumber != null ? groupNumber.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (surname != null ? surname.hashCode() : 0);
-        result = 31 * result + (driveFileId != null ? driveFileId.hashCode() : 0);
         return result;
     }
 
-    public String getMatricol() {
+    @Override
+    public String toString() {
+        return name + " " + surname;
+    }
 
+    public String getMatricol() {
         return matricol;
     }
 
@@ -75,13 +76,5 @@ public class Student {
 
     public void setSurname(String surname) {
         this.surname = surname;
-    }
-
-    public String getDriveFileId() {
-        return driveFileId;
-    }
-
-    public void setDriveFileId(String driveFileId) {
-        this.driveFileId = driveFileId;
     }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 
 import jxl.Sheet;
 import jxl.Workbook;
+import jxl.WorkbookSettings;
 
 /**
  * Created with Love by Lucian and Pi on 04.03.2016.
@@ -28,19 +29,19 @@ public class ExcelParser {
     private final String mFilePath;
 
     public ExcelParser(String number, String absolutePath) {
-        Log.i(TAG, "ExcelParser");
         mGroupNumber = number;
         mFilePath = absolutePath;
     }
 
-    public List<Student> parseFile() throws Exception {
-        Log.i(TAG, "parseFile");
+    public List<Student> parseFile() {
         // TODO use apache poi library for parsing Excel files. It's already downloaded.
         List<Student> studentsList = new ArrayList<>();
 
         try {
             File file = new File(mFilePath);
-            Workbook workbook = Workbook.getWorkbook(file);
+            WorkbookSettings ws = new WorkbookSettings();
+            ws.setEncoding("Cp1252");
+            Workbook workbook = Workbook.getWorkbook(file, ws);
             Sheet sheet = workbook.getSheet(0);
 
             for (int i = SKIP_ROWS; i < sheet.getRows(); i++) {
@@ -48,14 +49,14 @@ public class ExcelParser {
                         mGroupNumber,
                         sheet.getCell(INDEX_COLUMN_MATRICOL, i).getContents(),
                         sheet.getCell(INDEX_COLUMN_NAME, i).getContents(),
-                        sheet.getCell(INDEX_COLUMN_SURNAME, i).getContents(),
-                        "");
+                        sheet.getCell(INDEX_COLUMN_SURNAME, i).getContents());
                 studentsList.add(student);
             }
             return studentsList;
         } catch (Exception ex) {
-            throw new Exception(ex);
+            Log.i(TAG, "parseFile: " + ex.getMessage());
         }
+        return studentsList;
     }
 
 //    private LoadOptions getFileOptions() {

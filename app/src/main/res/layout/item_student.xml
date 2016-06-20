@@ -76,7 +76,7 @@
         android:layout_below="@+id/thumbnail"
         android:layout_toEndOf="@+id/student_list_button_1"
         android:layout_toRightOf="@+id/student_list_button_1"
-        android:text="@string/student_list_button_2"
+        android:text="@string/presence"
         android:textColor="@color/button_color" />
 
 </RelativeLayout>

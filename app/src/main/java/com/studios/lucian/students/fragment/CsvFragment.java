@@ -32,8 +32,7 @@ import java.util.List;
 /**
  * A simple {@link } subclass.
  */
-public class CsvFragment
-        extends ListFragment
+public class CsvFragment extends ListFragment
         implements AdapterView.OnItemClickListener {
 
     private static final String FORMAT_NOT_SUPPORTED = "The selected file doesn't have the proper format.";
@@ -97,7 +96,8 @@ public class CsvFragment
                 }
             }
         }
-        ArrayAdapter<String> fileList = new ArrayAdapter<>(this.getActivity(), R.layout.item_explorer, item);
+        ArrayAdapter<String> fileList =
+                new ArrayAdapter<>(this.getActivity(), R.layout.item_explorer_test, item);
         setListAdapter(fileList);
     }
 
@@ -108,14 +108,19 @@ public class CsvFragment
             if (file.canRead()) {
                 getDirectories(mPath.get(position));
             } else {
-                new AlertDialog.Builder(this.getActivity()).setTitle("[" + file.getName() + "] folder can't be read!").setPositiveButton("OK", null).show();
+                new AlertDialog.Builder(this.getActivity())
+                        .setTitle("[" + file.getName() + "] folder can't be read!")
+                        .setPositiveButton("OK", null)
+                        .show();
             }
         } else {
-            String fileExtension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(DOT));
+            String fileExtension =
+                    file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(DOT));
             if (fileExtension.equals(CSV)) {
                 selectGroupNumberDialogBox(file);
             } else {
-                Toast.makeText(getContext(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG)
+                        .show();
             }
         }
     }
@@ -161,8 +166,9 @@ public class CsvFragment
 
     private void redirectToMainFragment(Group group) {
         MainFragment mainFragment = ((MainActivity) getActivity()).getMainFragment();
-        mainFragment.addNewGroup(group);
-        getFragmentManager().beginTransaction().replace(R.id.main_content, mainFragment).commit();
+        if (mainFragment.addNewGroup(group)) {
+            getFragmentManager().beginTransaction().replace(R.id.main_content, mainFragment).commit();
+        }
     }
 
     private void setNavDrawerItemAsChecked() {

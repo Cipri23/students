@@ -17,12 +17,17 @@ import java.util.List;
  */
 public class GroupsGridAdapter extends BaseAdapter {
 
-    private final List<Group> mGroups;
     private final Context mContext;
+    private List<Group> mGroups;
 
     public GroupsGridAdapter(Context context, List<Group> groups) {
         mContext = context;
         mGroups = groups;
+    }
+
+    public void setData(List<Group> mGroups) {
+        this.mGroups = mGroups;
+        this.notifyDataSetChanged();
     }
 
     @Override

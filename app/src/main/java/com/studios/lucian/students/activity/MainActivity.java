@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,8 +31,7 @@ import com.studios.lucian.students.fragment.CsvFragment;
 import com.studios.lucian.students.fragment.ExcelFragment;
 import com.studios.lucian.students.fragment.MainFragment;
 
-public class MainActivity
-        extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -51,11 +49,9 @@ public class MainActivity
     private MainFragment mMainFragment;
 
     private GoogleApiClient mGoogleApiClient;
-    private Bitmap mBitmapToSave;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -66,7 +62,12 @@ public class MainActivity
         // Setup the drawer layout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,
+                mToolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Drive.API)
@@ -82,7 +83,10 @@ public class MainActivity
     private void setupMainFragment(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             mMainFragment = new MainFragment();
-            getFragmentManager().beginTransaction().replace(R.id.main_content, mMainFragment, "MF").commit();
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_content, mMainFragment, "MF")
+                    .commit();
             setTitle(getString(R.string.dashboard));
         }
         if (mNavigationView != null) {
@@ -110,8 +114,9 @@ public class MainActivity
                 break;
             case REQUEST_CODE_CREATOR:
                 if (resultCode == RESULT_OK) {
-                    DriveId driveId = data.getParcelableExtra(OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
-                    Toast.makeText(MainActivity.this, "File created with ID: " + driveId, Toast.LENGTH_SHORT).show();
+                    DriveId driveId = data
+                            .getParcelableExtra(OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
+                    Toast.makeText(MainActivity.this, "ID: " + driveId, Toast.LENGTH_SHORT).show();
                 } else {
                     Log.i(TAG, "onActivityResult: " + resultCode);
                 }
@@ -196,12 +201,6 @@ public class MainActivity
                 if (appHasPermission()) {
                     switchToCsvFragment();
                 }
-            } else if (id == R.id.nav_manage) {
-
-            } else if (id == R.id.nav_share) {
-
-            } else if (id == R.id.nav_send) {
-
             }
             return true;
         } catch (Exception e) {
@@ -247,10 +246,12 @@ public class MainActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_STORAGE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (USER_OPTION == R.id.nav_excel_file) switchToExcelFragment();
                     if (USER_OPTION == R.id.nav_csv_file) switchToCsvFragment();
                 } else {
@@ -261,7 +262,8 @@ public class MainActivity
     }
 
     private boolean appHasPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                     this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
@@ -288,7 +290,6 @@ public class MainActivity
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.i(TAG, "API client connected.");
-//        Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(driveContentsCallback);
         setGoogleApiClientToFragment();
     }
 
@@ -307,7 +308,8 @@ public class MainActivity
                 Log.e(TAG, "Exception while starting resolution activity", e);
             }
         } else {
-            GoogleApiAvailability.getInstance().getErrorDialog(this, connectionResult.getErrorCode(), 0).show();
+            GoogleApiAvailability.getInstance()
+                    .getErrorDialog(this, connectionResult.getErrorCode(), 0).show();
         }
     }
 
@@ -315,7 +317,7 @@ public class MainActivity
         try {
             mMainFragment.setGoogleApiClient(mGoogleApiClient);
         } catch (NullPointerException ex) {
-            Log.i(TAG, "setGoogleApiClientToFragment: mGoogleApiClient is null");
+            Log.i(TAG, "setGoogleApiClientToFragment: " + ex.getMessage());
         }
     }
 

@@ -9,19 +9,19 @@ public class Grade {
     private int labNumber;
     private String date;
 
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
     public Grade(String matricol, int grade, int labNumber, String date) {
 
         this.matricol = matricol;
         this.grade = grade;
         this.labNumber = labNumber;
+        this.date = date;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -79,4 +79,7 @@ public class Grade {
         this.labNumber = labNumber;
     }
 
+    public String getToastDisplay(Student student) {
+        return student.toString() + " was graded with " + grade;
+    }
 }

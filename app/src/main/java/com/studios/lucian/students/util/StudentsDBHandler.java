@@ -1,7 +1,6 @@
 package com.studios.lucian.students.util;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.studios.lucian.students.model.Group;
@@ -24,18 +23,11 @@ public class StudentsDbHandler {
     }
 
     public void insertStudents(List<Student> studentsList) {
-        new AsyncTask<List<Student>, Void, Void>() {
-            @SafeVarargs
-            @Override
-            protected final Void doInBackground(List<Student>... lists) {
-                for (Student student : lists[0]) {
-                    if (!mStudentDAO.find(student)) {
-                        mStudentDAO.add(student);
-                    }
-                }
-                return null;
+        for (Student student : studentsList) {
+            if (!mStudentDAO.find(student)) {
+                mStudentDAO.add(student);
             }
-        }.execute(studentsList);
+        }
     }
 
     public List<Student> getAll() {
@@ -84,11 +76,11 @@ public class StudentsDbHandler {
         return mStudentDAO.getStudentsFromGroup(mGroupNumber);
     }
 
-    public String getGroupDriveFileId(String mGroupNumber) {
-        return mStudentDAO.getGroupDriveFileId(mGroupNumber);
-    }
-
-    public void setGroupDriveId(String groupDriveId, String groupNumber) {
-        mStudentDAO.setGroupDriveId(groupDriveId, groupNumber);
-    }
+//    public String getGroupDriveFileId(String mGroupNumber) {
+//        return mStudentDAO.getGroupDriveFileId(mGroupNumber);
+//    }
+//
+//    public void setGroupDriveId(String groupDriveId, String groupNumber) {
+//        mStudentDAO.setGroupDriveId(groupDriveId, groupNumber);
+//    }
 }

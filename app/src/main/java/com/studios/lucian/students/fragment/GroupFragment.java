@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -23,16 +22,24 @@ import com.studios.lucian.students.R;
 import com.studios.lucian.students.activity.DisplayStudentActivity;
 import com.studios.lucian.students.activity.MainActivity;
 import com.studios.lucian.students.adapter.StudentsListAdapter;
+import com.studios.lucian.students.model.Grade;
+import com.studios.lucian.students.model.Group;
+import com.studios.lucian.students.model.Presence;
 import com.studios.lucian.students.model.Student;
+import com.studios.lucian.students.repository.GradesDAO;
+import com.studios.lucian.students.repository.GroupDAO;
+import com.studios.lucian.students.repository.PresenceDAO;
+import com.studios.lucian.students.sync.DriveSyncHandler;
+import com.studios.lucian.students.util.DialogsHandler;
+import com.studios.lucian.students.util.StudentButtonsListener;
 import com.studios.lucian.students.util.StudentsDbHandler;
 import com.studios.lucian.students.util.Validator;
+import com.studios.lucian.students.util.listener.StudentActionsListener;
 
 import java.util.List;
 
-public class GroupFragment
-        extends ListFragment
-        implements View.OnClickListener,
-        AdapterView.OnItemClickListener {
+public class GroupFragment extends ListFragment
+        implements AdapterView.OnItemClickListener, StudentActionsListener, StudentButtonsListener {
 
     private static final String TAG = GroupFragment.class.getSimpleName();
     private static final String GROUP = "Group ";
@@ -41,20 +48,79 @@ public class GroupFragment
 
     private FloatingActionButton mFloatingActionButton;
     private TextView emptyText;
-    private StudentsDbHandler mStudentsDbHandler;
+    private DriveSyncHandler mDriveSyncHandler;
     private StudentsListAdapter listAdapter;
-    private String mGroupNumber;
+    private StudentsDbHandler mStudentsDbHandler;
+    private DialogsHandler mDialogsHandler;
+    private GradesDAO mGradesDao;
     private List<Student> mStudentsList;
+    private PresenceDAO mPresenceDao;
+    private Group mCurrentGroup;
+    private GroupDAO mGroupDao;
+    private View.OnClickListener floatingButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+            final LayoutInflater inflater = getActivity().getLayoutInflater();
+            final View alertView = inflater.inflate(R.layout.dialog_add_student, null);
+
+            TextView dialogGroupNumber = (TextView) alertView.findViewById(R.id.dialog_group_number);
+            final EditText dialogMatricol = (EditText) alertView.findViewById(R.id.dialog_student_id);
+            final EditText dialogName = (EditText) alertView.findViewById(R.id.dialog_name);
+            final EditText dialogSurname = (EditText) alertView.findViewById(R.id.dialog_surname);
+            dialogGroupNumber.setText(getDialogGroupNumberText());
+
+            dialog.setView(alertView)
+                    .setPositiveButton(R.string.button_add_student, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            boolean inputsAreOk = true;
+                            if (!Validator.isValidMatricol(dialogMatricol.getText().toString())) {
+                                inputsAreOk = false;
+                                dialogMatricol.setError("Invalid Student ID");
+                            }
+                            if (!Validator.isValidName(dialogName.getText().toString())) {
+                                inputsAreOk = false;
+                                dialogName.setError("Invalid Name");
+                            }
+                            if (!Validator.isValidName(dialogSurname.getText().toString())) {
+                                inputsAreOk = false;
+                                dialogSurname.setError("Invalid Surname");
+                            }
+                            if (inputsAreOk) {
+                                addNewStudent(
+                                        dialogMatricol.getText().toString(),
+                                        dialogName.getText().toString(),
+                                        dialogSurname.getText().toString());
+                            } else {
+                                showWarning(R.string.error_add_student_title, R.string.error_add_student_message);
+                            }
+                        }
+                    })
+                    .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .create()
+                    .show();
+        }
+    };
 
     public GroupFragment() {
-        Log.i(TAG, "GroupFragment");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Bundle bundle = this.getArguments();
-        mGroupNumber = bundle.getString("groupNumber");
+        GroupDAO groupDAO = new GroupDAO(getActivity());
+
+        String groupNumber = bundle.getString("groupNumber");
+        mCurrentGroup = groupDAO.get(groupNumber);
+
         mStudentsDbHandler = new StudentsDbHandler(getActivity());
+        mGroupDao = new GroupDAO(getActivity());
         return inflater.inflate(R.layout.fragment_group, container, false);
     }
 
@@ -64,9 +130,13 @@ public class GroupFragment
 
         emptyText = (TextView) view.findViewById(android.R.id.empty);
         mFloatingActionButton = (FloatingActionButton) view.findViewById(R.id.fab);
-        mFloatingActionButton.setOnClickListener(this);
-
+        mFloatingActionButton.setOnClickListener(floatingButtonClick);
         getListView().setOnItemClickListener(this);
+        mDialogsHandler = new DialogsHandler(getActivity(), this);
+        this.mGradesDao = new GradesDAO(getActivity());
+        this.mPresenceDao = new PresenceDAO(getActivity());
+        MainFragment mainFragment = ((MainActivity) getActivity()).getMainFragment();
+        mDriveSyncHandler = new DriveSyncHandler(mainFragment.getGoogleApiClient(), null);
         setAdapter();
     }
 
@@ -74,7 +144,7 @@ public class GroupFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getListView().setEmptyView(emptyText);
-        getActivity().setTitle(GROUP + mGroupNumber);
+        getActivity().setTitle(GROUP + mCurrentGroup.getNumber());
     }
 
     @Override
@@ -93,7 +163,8 @@ public class GroupFragment
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (getUserVisibleHint()) {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            AdapterView.AdapterContextMenuInfo info =
+                    (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             switch (item.getItemId()) {
                 case R.id.student_menu_edit:
                     editStudent((int) info.id);
@@ -109,9 +180,10 @@ public class GroupFragment
     }
 
     private void addNewStudent(String matricol, String name, String surname) {
-        String driveId = mStudentsDbHandler.getGroupDriveFileId(mGroupNumber);
-        Student student = new Student(String.valueOf(mGroupNumber), matricol, name, surname, driveId);
+        Student student = new Student(mCurrentGroup.getNumber(), matricol, name, surname);
         if (mStudentsDbHandler.addStudent(student)) {
+            mGroupDao.increaseCount(mCurrentGroup);
+            ((MainActivity) getActivity()).getMainFragment().syncGroups();
             mStudentsList.add(student);
             listAdapter.notifyDataSetChanged();
             Toast.makeText(getContext(), R.string.student_added, Toast.LENGTH_SHORT).show();
@@ -153,8 +225,7 @@ public class GroupFragment
                                     id,
                                     dialogMatricolNumber.getText().toString(),
                                     dialogName.getText().toString(),
-                                    dialogSurname.getText().toString(),
-                                    student.getDriveFileId());
+                                    dialogSurname.getText().toString());
                         } else {
                             showWarning(R.string.error_update_student_title, R.string.error_update_student_message);
                         }
@@ -170,8 +241,8 @@ public class GroupFragment
                 .show();
     }
 
-    private void updateStudent(int id, String matricol, String name, String surname, String driveFileId) {
-        Student student = new Student(String.valueOf(mGroupNumber), matricol, name, surname, driveFileId);
+    private void updateStudent(int id, String matricol, String name, String surname) {
+        Student student = new Student(mCurrentGroup.getNumber(), matricol, name, surname);
         if (mStudentsDbHandler.updateStudent(student)) {
             mStudentsList.set(id, student);
             listAdapter.notifyDataSetChanged();
@@ -183,17 +254,19 @@ public class GroupFragment
     private void deleteStudent(int id) {
         Student student = mStudentsList.get(id);
         if (mStudentsDbHandler.deleteStudent(student)) {
+            mGroupDao.decreaseCount(mCurrentGroup);
+            ((MainActivity) getActivity()).getMainFragment().syncGroups();
             mStudentsList.remove(id);
             listAdapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(getContext(), R.string.student_not_found, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.student_not_found, Toast.LENGTH_SHORT)
+                    .show();
         }
     }
 
     private void setAdapter() {
-        mStudentsList = mStudentsDbHandler.getStudentsFromGroup(mGroupNumber);
-        MainFragment mainFragment = ((MainActivity) getActivity()).getMainFragment();
-        listAdapter = new StudentsListAdapter(getContext(), mStudentsList, mainFragment.getGoogleApiClient());
+        mStudentsList = mStudentsDbHandler.getStudentsFromGroup(mCurrentGroup.getNumber());
+        listAdapter = new StudentsListAdapter(getContext(), mStudentsList, this);
         setListAdapter(listAdapter);
     }
 
@@ -214,56 +287,7 @@ public class GroupFragment
     }
 
     private String getDialogGroupNumberText() {
-        return getString(R.string.dialog_group_number) + EMPTY_SPACE + mGroupNumber;
-    }
-
-    @Override
-    public void onClick(View view) {
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-        final LayoutInflater inflater = getActivity().getLayoutInflater();
-        final View alertView = inflater.inflate(R.layout.dialog_add_student, null);
-
-        TextView dialogGroupNumber = (TextView) alertView.findViewById(R.id.dialog_group_number);
-        final EditText dialogMatricol = (EditText) alertView.findViewById(R.id.dialog_student_id);
-        final EditText dialogName = (EditText) alertView.findViewById(R.id.dialog_name);
-        final EditText dialogSurname = (EditText) alertView.findViewById(R.id.dialog_surname);
-        dialogGroupNumber.setText(getDialogGroupNumberText());
-
-        dialog.setView(alertView)
-                .setPositiveButton(R.string.button_add_student, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        boolean inputsAreOk = true;
-                        if (!Validator.isValidMatricol(dialogMatricol.getText().toString())) {
-                            inputsAreOk = false;
-                            dialogMatricol.setError("Invalid Student ID");
-                        }
-                        if (!Validator.isValidName(dialogName.getText().toString())) {
-                            inputsAreOk = false;
-                            dialogName.setError("Invalid Name");
-                        }
-                        if (!Validator.isValidName(dialogSurname.getText().toString())) {
-                            inputsAreOk = false;
-                            dialogSurname.setError("Invalid Surname");
-                        }
-                        if (inputsAreOk) {
-                            addNewStudent(
-                                    dialogMatricol.getText().toString(),
-                                    dialogName.getText().toString(),
-                                    dialogSurname.getText().toString());
-                        } else {
-                            showWarning(R.string.error_add_student_title, R.string.error_add_student_message);
-                        }
-                    }
-                })
-                .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .create()
-                .show();
+        return getString(R.string.dialog_group_number) + EMPTY_SPACE + mCurrentGroup.getNumber();
     }
 
     @Override
@@ -272,5 +296,39 @@ public class GroupFragment
         Intent intent = new Intent(getActivity(), DisplayStudentActivity.class);
         intent.putExtra(KEY_MATRICOL, student.getMatricol());
         startActivity(intent);
+    }
+
+    @Override
+    public void onPresenceClick(Student student) {
+        mDialogsHandler.showAddPresenceDialog(student);
+    }
+
+    @Override
+    public void onGradeClick(Student student) {
+        mDialogsHandler.showAddGradeDialog(student);
+    }
+
+    @Override
+    public void addGrade(Student student, Grade grade) {
+        boolean addedSuccessfully = mGradesDao.add(grade);
+        if (addedSuccessfully) {
+            if (mDriveSyncHandler.syncGrade(grade, mCurrentGroup, student)) {
+                Toast.makeText(getActivity(), grade.getToastDisplay(student), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    public void addPresence(Student student, Presence presence) {
+        boolean addedSuccessfully = mPresenceDao.add(presence);
+        if (addedSuccessfully) {
+            if (mDriveSyncHandler.syncPresence(presence, mCurrentGroup, student)) {
+                Toast.makeText(getActivity(), presence.getToastDisplay(student), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

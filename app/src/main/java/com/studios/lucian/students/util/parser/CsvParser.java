@@ -38,7 +38,7 @@ public class CsvParser {
             bufferedReader = new BufferedReader(fileReader);
             while ((line = bufferedReader.readLine()) != null) {
                 String[] components = line.split(CSV_DEFAULT_SEPARATOR);
-                studentList.add(new Student(mGroupNumber, components[0], components[1], components[2], ""));
+                studentList.add(new Student(mGroupNumber, components[0], components[1], components[2]));
             }
         } catch (FileNotFoundException e) {
             Log.i(TAG, e.getMessage());

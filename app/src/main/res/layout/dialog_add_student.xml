@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:background="@color/colorPrimary"
+        android:gravity="center"
         android:paddingTop="3dp"
         android:scaleType="center"
         android:text="@string/dialog_add_student_title"
@@ -19,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
+        android:gravity="center"
         android:paddingBottom="4dp"
         android:textColor="@android:color/white"
         android:textSize="16sp" />
