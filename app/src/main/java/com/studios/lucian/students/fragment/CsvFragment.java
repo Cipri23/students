@@ -13,17 +13,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.activity.MainActivity;
-import com.studios.lucian.students.model.Group;
-import com.studios.lucian.students.model.Student;
+import com.studios.lucian.students.adapter.FileExplorerAdapter;
+import com.studios.lucian.students.repository.GroupDAO;
+import com.studios.lucian.students.util.DialogsHandler;
 import com.studios.lucian.students.util.StudentsDbHandler;
-import com.studios.lucian.students.util.parser.CsvParser;
+import com.studios.lucian.students.util.Validator;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -96,9 +96,8 @@ public class CsvFragment extends ListFragment
                 }
             }
         }
-        ArrayAdapter<String> fileList =
-                new ArrayAdapter<>(this.getActivity(), R.layout.item_explorer_test, item);
-        setListAdapter(fileList);
+        FileExplorerAdapter fileExplorerAdapter = new FileExplorerAdapter(getContext(), item, mPath);
+        setListAdapter(fileExplorerAdapter);
     }
 
     @Override
@@ -140,8 +139,12 @@ public class CsvFragment extends ListFragment
         dialogBuilder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                mGroupNumber = input.getText().toString();
-                handleCsvFile(file);
+                String userInput = input.getText().toString();
+                if (Validator.isValidGroupNumber(userInput) && !groupExists(userInput)) {
+                    handleCsvFile(file, userInput);
+                } else {
+                    DialogsHandler.showWrongGroupNumber(userInput, getContext());
+                }
             }
         });
         dialogBuilder.setNegativeButton("Cancel", null);
@@ -150,25 +153,17 @@ public class CsvFragment extends ListFragment
         dialog.show();
     }
 
-    private void handleCsvFile(File file) {
-        int studentsCount = insertRecords(file);
-        Group group = new Group(mGroupNumber, studentsCount);
-        redirectToMainFragment(group);
-        setNavDrawerItemAsChecked();
+    private boolean groupExists(String userInput) {
+        GroupDAO groupDAO = new GroupDAO(getActivity());
+        return groupDAO.find(userInput);
     }
 
-    private int insertRecords(File fileName) {
-        CsvParser csvParser = new CsvParser(mGroupNumber, fileName);
-        List<Student> studentList = csvParser.parseFile();
-        mStudentsDbHandler.insertStudents(studentList);
-        return studentList.size();
-    }
-
-    private void redirectToMainFragment(Group group) {
+    private void handleCsvFile(File file, String groupNumber) {
         MainFragment mainFragment = ((MainActivity) getActivity()).getMainFragment();
-        if (mainFragment.addNewGroup(group)) {
-            getFragmentManager().beginTransaction().replace(R.id.main_content, mainFragment).commit();
-        }
+        mainFragment.addNewGroup(file, groupNumber, "csv");
+
+        getFragmentManager().beginTransaction().replace(R.id.main_content, mainFragment).commit();
+        setNavDrawerItemAsChecked();
     }
 
     private void setNavDrawerItemAsChecked() {

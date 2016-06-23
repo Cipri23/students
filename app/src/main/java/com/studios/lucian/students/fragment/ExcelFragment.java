@@ -8,18 +8,17 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.studios.lucian.students.R;
 import com.studios.lucian.students.activity.MainActivity;
+import com.studios.lucian.students.adapter.FileExplorerAdapter;
 import com.studios.lucian.students.repository.GroupDAO;
 import com.studios.lucian.students.util.DialogsHandler;
 import com.studios.lucian.students.util.StudentsDbHandler;
@@ -76,14 +75,11 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
     }
 
     private void getDirectories(String dirPath) {
-        Log.i(TAG, "getDirectories: entered");
         mTextViewPath.setText(String.format("%s%s", getString(R.string.location), dirPath));
         List<String> item = new ArrayList<>();
         mPath = new ArrayList<>();
         File file = new File(dirPath);
         File[] files = file.listFiles();
-
-        Log.i(TAG, dirPath);
 
         if (!dirPath.equals(mFileExplorerRoot)) {
             item.add(mFileExplorerRoot);
@@ -101,10 +97,8 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
                 }
             }
         }
-//        FileExplorerAdapter fileExplorerAdapter = new FileExplorerAdapter(getContext(), item, mPath);
-        ArrayAdapter<String> fileList =
-                new ArrayAdapter<>(this.getActivity(), R.layout.item_explorer_test, item);
-        setListAdapter(fileList);
+        FileExplorerAdapter fileExplorerAdapter = new FileExplorerAdapter(getContext(), item, mPath);
+        setListAdapter(fileExplorerAdapter);
     }
 
     @Override
@@ -175,7 +169,7 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
 
     private void handleXlsFile(File file, String groupNumber) {
         MainFragment mainFragment = ((MainActivity) getActivity()).getMainFragment();
-        mainFragment.addNewGroup(file, groupNumber);
+        mainFragment.addNewGroup(file, groupNumber, "excel");
 
         getFragmentManager().beginTransaction().replace(R.id.main_content, mainFragment).commit();
         setNavDrawerItemAsChecked();

@@ -179,7 +179,7 @@ public class StudentDAO extends DataBaseHelper {
 
     public List<Student> getStudentsFromGroup(String groupNumber) {
         List<Student> studentList = new ArrayList<>();
-        String matricol, name, surname, driveId;
+        String matricol, name, surname;
         int retrievedRows;
         SQLiteDatabase database = getWritableDatabase();
 

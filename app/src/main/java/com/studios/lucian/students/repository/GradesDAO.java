@@ -66,4 +66,18 @@ public class GradesDAO extends DataBaseHelper {
         }
         return grades;
     }
+
+    public void deleteRecords(String matricol) {
+        try {
+            SQLiteDatabase database = getWritableDatabase();
+            int affectedRows = database.delete(TABLE_NAME_GRADE, COLUMN_GRADE_MATRICOL + " = ?",
+                    new String[]{matricol});
+            if (database.isOpen()) {
+                database.close();
+            }
+            Log.i(TAG, "delete result: " + affectedRows);
+        } catch (SQLiteException ex) {
+            Log.i(TAG, ex.getMessage());
+        }
+    }
 }

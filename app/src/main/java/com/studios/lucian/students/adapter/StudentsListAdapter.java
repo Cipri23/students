@@ -23,7 +23,7 @@ public class StudentsListAdapter extends ArrayAdapter<Student> {
     private final Context mContext;
     private final List<Student> mStudentsList;
     private final int mResource;
-    private StudentActionsListener listener;
+    private final StudentActionsListener listener;
 
     public StudentsListAdapter(Context context, List<Student> objects, StudentActionsListener listener) {
         super(context, R.layout.item_student, objects);

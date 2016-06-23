@@ -57,7 +57,7 @@ public class GroupFragment extends ListFragment
     private PresenceDAO mPresenceDao;
     private Group mCurrentGroup;
     private GroupDAO mGroupDao;
-    private View.OnClickListener floatingButtonClick = new View.OnClickListener() {
+    private final View.OnClickListener floatingButtonClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());

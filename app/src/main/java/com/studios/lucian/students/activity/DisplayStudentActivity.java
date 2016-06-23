@@ -1,18 +1,19 @@
 package com.studios.lucian.students.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.studios.lucian.students.R;
-import com.studios.lucian.students.adapter.GradesListAdapter;
-import com.studios.lucian.students.model.Grade;
+import com.studios.lucian.students.adapter.PagerAdapter;
 import com.studios.lucian.students.model.Student;
+import com.studios.lucian.students.repository.PresenceDAO;
 import com.studios.lucian.students.util.GradesDbHandler;
 import com.studios.lucian.students.util.StudentsDbHandler;
-
-import java.util.List;
 
 public class DisplayStudentActivity extends AppCompatActivity {
     private static final String TAG = DisplayStudentActivity.class.getSimpleName();
@@ -21,32 +22,33 @@ public class DisplayStudentActivity extends AppCompatActivity {
     private GradesDbHandler mGradesHandler;
     private StudentsDbHandler mStudentsHandler;
     private android.support.v7.app.ActionBar mAppBar;
-    private ListView mListView;
+    private ListView mListViewGrades;
+    private ListView mListViewPresences;
     private TextView mEmptyText;
     private Student mCurrentStudent;
+    private PresenceDAO mPresenceDao;
+    private ViewPager mViewPager;
+    private TabLayout mTabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_student);
 
-        mListView = (ListView) findViewById(android.R.id.list);
-        mEmptyText = (TextView) findViewById(android.R.id.empty);
-        mGradesHandler = new GradesDbHandler(getApplicationContext());
-        mStudentsHandler = new StudentsDbHandler(getApplicationContext());
+        mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
+
         mAppBar = getSupportActionBar();
         getExtras();
         if (mCurrentStudent != null) {
             setupToolbar();
-            setupMainContent();
         }
-    }
 
-    private void setupMainContent() {
-        List<Grade> grades = mGradesHandler.getStudentGrades(mCurrentStudent.getMatricol());
-        GradesListAdapter adapter = new GradesListAdapter(getApplicationContext(), grades);
-        mListView.setAdapter(adapter);
-        mListView.setEmptyView(mEmptyText);
+        FragmentManager manager = getSupportFragmentManager();
+        PagerAdapter adapter = new PagerAdapter(manager, mCurrentStudent);
+        mViewPager.setAdapter(adapter);
+        mTabLayout.setupWithViewPager(mViewPager);
+
     }
 
     private void setupToolbar() {
@@ -55,6 +57,7 @@ public class DisplayStudentActivity extends AppCompatActivity {
     }
 
     private void getExtras() {
+        mStudentsHandler = new StudentsDbHandler(this);
         Bundle bundle = getIntent().getExtras();
         String matricol = bundle.getString(KEY_MATRICOL);
         mCurrentStudent = mStudentsHandler.findStudent(matricol);

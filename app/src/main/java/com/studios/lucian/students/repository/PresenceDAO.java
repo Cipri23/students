@@ -1,10 +1,15 @@
 package com.studios.lucian.students.repository;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import com.studios.lucian.students.model.Presence;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with Love by Lucian and Pi on 20.06.2016.
@@ -28,10 +33,44 @@ public class PresenceDAO extends DataBaseHelper {
         long result = database.insert(TABLE_NAME_PRESENCE, null, presence.getContentValues());
         database.close();
         if (result == -1) {
-            Log.i(TAG, "Grade not Added: " + presence.toString());
+            Log.i(TAG, "Presence not Added: " + presence.toString());
             return false;
         }
-        Log.i(TAG, "Grade Added: " + presence.toString());
+        Log.i(TAG, "Presence Added: " + presence.toString());
         return true;
+    }
+
+    public List<Presence> getStudentPresences(String matricol) {
+        List<Presence> presences = new ArrayList<>();
+        try {
+            SQLiteDatabase database = getReadableDatabase();
+            String query = "SELECT * FROM " + TABLE_NAME_PRESENCE + " WHERE " + COLUMN_PRESENCE_MATRICOL + " =?";
+            Cursor cursor = database.rawQuery(query, new String[]{matricol});
+
+            while (cursor.moveToNext()) {
+                String date = cursor.getString(cursor.getColumnIndex(COLUMN_PRESENCE_DATE));
+                int labNr = cursor.getInt(cursor.getColumnIndex(COLUMN_PRESENCE_LAB_NR));
+                presences.add(new Presence(matricol, labNr, date));
+            }
+            if (!cursor.isClosed()) cursor.close();
+            if (database.isOpen()) database.close();
+        } catch (SQLiteException ex) {
+            Log.i(TAG, ex.getMessage());
+        }
+        return presences;
+    }
+
+    public void deleteRecords(String matricol) {
+        try {
+            SQLiteDatabase database = getWritableDatabase();
+            int affectedRows = database.delete(TABLE_NAME_PRESENCE, COLUMN_PRESENCE_MATRICOL + " = ?",
+                    new String[]{matricol});
+            if (database.isOpen()) {
+                database.close();
+            }
+            Log.i(TAG, "delete result: " + affectedRows);
+        } catch (SQLiteException ex) {
+            Log.i(TAG, ex.getMessage());
+        }
     }
 }

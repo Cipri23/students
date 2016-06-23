@@ -35,8 +35,8 @@ import java.io.Writer;
 public class DriveSyncHandler {
     private static final String TAG = DriveSyncHandler.class.getSimpleName();
     private final GoogleApiClient mGoogleApiClient;
-    private DriveFileCallBackListener listener;
-    private ResultCallback<Status> commitChangesCallBack = new ResultCallback<Status>() {
+    private final DriveFileCallBackListener listener;
+    private final ResultCallback<Status> commitChangesCallBack = new ResultCallback<Status>() {
         @Override
         public void onResult(@NonNull Status status) {
             Log.i(TAG, "onResult: result = " + status.getStatus());
@@ -86,6 +86,7 @@ public class DriveSyncHandler {
                             }
                         }
                     });
+            return true;
         }
         return false;
     }
@@ -128,9 +129,8 @@ public class DriveSyncHandler {
                         }
                     });
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Nullable

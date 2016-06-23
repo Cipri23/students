@@ -1,7 +1,7 @@
 package com.studios.lucian.students.adapter;
 
 import android.content.Context;
-import android.util.Log;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +12,8 @@ import android.widget.TextView;
 import com.studios.lucian.students.R;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,8 +22,8 @@ import java.util.List;
 public class FileExplorerAdapter extends ArrayAdapter {
 
     private final List<String> paths;
-    private List<String> files;
-    private Context context;
+    private final List<String> files;
+    private final Context context;
 
     public FileExplorerAdapter(Context context, List<String> item, List<String> paths) {
         super(context, R.layout.item_explorer, item);
@@ -32,26 +34,56 @@ public class FileExplorerAdapter extends ArrayAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.i("FileEx", "getView: " + files.get(position));
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view;
-        if (convertView == null) {
-            view = inflater.inflate(R.layout.item_explorer, null);
-            ImageView imageView = (ImageView) view.findViewById(R.id.file_icon);
-            TextView textView = (TextView) view.findViewById(R.id.rowtext);
-            TextView textViewBytes = (TextView) view.findViewById(R.id.text_view_bytes);
-            TextView textViewDate = (TextView) view.findViewById(R.id.text_view_date);
+        View rowView = convertView;
+        if (rowView == null) {
+            rowView = LayoutInflater.from(context).inflate(R.layout.item_explorer, parent, false);
+            ViewHolder viewHolder = new ViewHolder();
 
-            File file = new File(paths.get(position));
-            if (file.isDirectory()) {
-                imageView.setImageResource(R.drawable.directory_icon);
-            } else {
-                imageView.setImageResource(R.drawable.file_icon);
-            }
-            textView.setText(files.get(position));
-        } else {
-            view = convertView;
+            viewHolder.icon = (ImageView) rowView.findViewById(R.id.file_icon);
+            viewHolder.textName = (TextView) rowView.findViewById(R.id.rowtext);
+            viewHolder.textBytes = (TextView) rowView.findViewById(R.id.text_view_bytes);
+            viewHolder.textDate = (TextView) rowView.findViewById(R.id.text_view_date);
+            rowView.setTag(viewHolder);
         }
-        return view;
+
+        File file = new File(paths.get(position));
+        final ViewHolder holder = (ViewHolder) rowView.getTag();
+
+        holder.textName.setText(files.get(position));
+        holder.textDate.setText(getLastModified(file));
+        if (file.isDirectory()) {
+            holder.icon.setImageResource(R.drawable.directory_icon);
+            holder.textBytes.setText(getItemsCount(file));
+        } else {
+            holder.textBytes.setText(file.length() + " Bytes");
+            holder.icon.setImageResource(R.drawable.file_icon);
+        }
+        return rowView;
+    }
+
+    private String getLastModified(File file) {
+        Date lastModDate = new Date(file.lastModified());
+        DateFormat formatter = DateFormat.getDateTimeInstance();
+        return formatter.format(lastModDate);
+    }
+
+    @NonNull
+    private String getItemsCount(File file) {
+        File[] fbuf = file.listFiles();
+        int buf;
+        if (fbuf != null) {
+            buf = fbuf.length;
+        } else buf = 0;
+        String num_item = String.valueOf(buf);
+        if (buf == 0) num_item = num_item + " item";
+        else num_item = num_item + " items";
+        return num_item;
+    }
+
+    static class ViewHolder {
+        ImageView icon;
+        TextView textName;
+        TextView textBytes;
+        TextView textDate;
     }
 }

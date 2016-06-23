@@ -55,7 +55,6 @@ public class GroupDAO extends DataBaseHelper {
         String queryGroups = "SELECT * FROM " + TABLE_NAME_GROUP;
 
         Cursor cursor = getReadableDatabase().rawQuery(queryGroups, null);
-        int retrievedRows = cursor.getCount();
 
         while (cursor.moveToNext()) {
             String groupNr = cursor.getString(cursor.getColumnIndex(COLUMN_GROUP_NUMBER));

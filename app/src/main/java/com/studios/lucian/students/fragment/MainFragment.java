@@ -23,9 +23,11 @@ import com.studios.lucian.students.repository.GroupDAO;
 import com.studios.lucian.students.sync.DriveSyncHandler;
 import com.studios.lucian.students.util.DriveFileCallBackListener;
 import com.studios.lucian.students.util.StudentsDbHandler;
+import com.studios.lucian.students.util.parser.CsvParser;
 import com.studios.lucian.students.util.parser.ExcelParser;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -95,16 +97,6 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
                 .commit();
     }
 
-    public boolean addNewGroup(Group group) {
-        mGroups.add(group);
-        groupNumber = group.getNumber();
-        mGroupsGridAdapter.notifyDataSetChanged();
-        if (mDriveSyncHandler != null) {
-            mDriveSyncHandler.syncNewFile(groupNumber);
-        }
-        return false;
-    }
-
     public GoogleApiClient getGoogleApiClient() {
         if (mGoogleApiClient != null) {
             return mGoogleApiClient;
@@ -126,18 +118,24 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
         syncGroups();
     }
 
-    public void addNewGroup(File file, final String groupNumber) {
-        final ExcelParser excelParser = new ExcelParser(groupNumber, file.getAbsolutePath());
-
+    public void addNewGroup(final File file, final String groupNumber, final String fileType) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                List<Student> studentList = excelParser.parseFile();
+                List<Student> studentList = new ArrayList<>();
+
+                if (fileType.equals("csv")) {
+                    final CsvParser csvParser = new CsvParser(groupNumber, file);
+                    studentList = csvParser.parseFile();
+                } else if (fileType.equals("excel")) {
+                    final ExcelParser excelParser = new ExcelParser(groupNumber, file.getAbsolutePath());
+                    studentList = excelParser.parseFile();
+                }
                 Group group = new Group(groupNumber, studentList.size());
                 if (mGroupDao.add(group)) {
                     mStudentsDbHandler.insertStudents(studentList);
                 } else {
-                    Log.i(TAG, "doInBackground: errrrrrrrrrrrrrrrrrrrrr");
+                    Log.i(TAG, "doInBackground: err");
                 }
                 return null;
             }

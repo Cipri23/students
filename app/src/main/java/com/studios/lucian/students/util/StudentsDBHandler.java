@@ -1,10 +1,11 @@
 package com.studios.lucian.students.util;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.studios.lucian.students.model.Group;
 import com.studios.lucian.students.model.Student;
+import com.studios.lucian.students.repository.GradesDAO;
+import com.studios.lucian.students.repository.PresenceDAO;
 import com.studios.lucian.students.repository.StudentDAO;
 
 import java.util.List;
@@ -16,9 +17,10 @@ public class StudentsDbHandler {
     private final String TAG = StudentsDbHandler.class.getSimpleName();
 
     private final StudentDAO mStudentDAO;
+    private final Context context;
 
     public StudentsDbHandler(Context context) {
-        Log.i(TAG, "StudentsDbHandler");
+        this.context = context;
         mStudentDAO = new StudentDAO(context);
     }
 
@@ -50,6 +52,12 @@ public class StudentsDbHandler {
 
     public boolean deleteStudent(Student student) {
         if (mStudentDAO.find(student)) {
+            GradesDAO mGradesDao = new GradesDAO(context);
+            PresenceDAO presenceDAO = new PresenceDAO(context);
+
+            mGradesDao.deleteRecords(student.getMatricol());
+            presenceDAO.deleteRecords(student.getMatricol());
+
             int affectedRows = mStudentDAO.delete(student);
             if (affectedRows == 1) return true;
         }
@@ -75,12 +83,4 @@ public class StudentsDbHandler {
     public List<Student> getStudentsFromGroup(String mGroupNumber) {
         return mStudentDAO.getStudentsFromGroup(mGroupNumber);
     }
-
-//    public String getGroupDriveFileId(String mGroupNumber) {
-//        return mStudentDAO.getGroupDriveFileId(mGroupNumber);
-//    }
-//
-//    public void setGroupDriveId(String groupDriveId, String groupNumber) {
-//        mStudentDAO.setGroupDriveId(groupDriveId, groupNumber);
-//    }
 }

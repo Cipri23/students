@@ -29,7 +29,7 @@ public class DialogsHandler {
     private final Context mContext;
     private final GradesDbHandler mGradesDbHandler;
     private final StudentsDbHandler mStudentsDbHandler;
-    private StudentButtonsListener listener;
+    private final StudentButtonsListener listener;
 
     public DialogsHandler(Context context, StudentButtonsListener listener) {
         mContext = context;

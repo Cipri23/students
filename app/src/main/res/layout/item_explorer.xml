@@ -16,6 +16,7 @@
         android:layout_marginTop="5dip"
         android:layout_toRightOf="@+id/file_icon"
         android:singleLine="true"
+        android:textSize="16sp"
         android:textStyle="bold" />
 
     <TextView
@@ -23,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/rowtext"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="5dip"
         android:layout_toRightOf="@+id/file_icon" />
 
     <TextView

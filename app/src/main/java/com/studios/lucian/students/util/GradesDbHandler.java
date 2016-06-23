@@ -28,7 +28,7 @@ public class GradesDbHandler {
 
     }
 
-    public GradesDbHandler(Context context, GoogleApiClient mGoogleApiClient) {
+    private GradesDbHandler(Context context, GoogleApiClient mGoogleApiClient) {
         this.mContext = context;
         mGradesDAO = new GradesDAO(context);
         mStudentsDAO = new StudentDAO(context);

@@ -23,12 +23,7 @@ public class Student {
 
         Student student = (Student) o;
 
-        if (matricol != null ? !matricol.equals(student.matricol) : student.matricol != null)
-            return false;
-        if (groupNumber != null ? !groupNumber.equals(student.groupNumber) : student.groupNumber != null)
-            return false;
-        if (name != null ? !name.equals(student.name) : student.name != null) return false;
-        return surname != null ? surname.equals(student.surname) : student.surname == null;
+        return matricol != null ? matricol.equals(student.matricol) : student.matricol == null && (groupNumber != null ? groupNumber.equals(student.groupNumber) : student.groupNumber == null && (name != null ? name.equals(student.name) : student.name == null && (surname != null ? surname.equals(student.surname) : student.surname == null)));
 
     }
 
