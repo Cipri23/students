@@ -22,10 +22,10 @@ public class GradesListAdapter extends ArrayAdapter<Grade> {
     private final int mResource;
 
     public GradesListAdapter(Context context, List<Grade> objects) {
-        super(context, R.layout.grade_item, objects);
+        super(context, R.layout.item_grade, objects);
         mContext = context;
         mStudentsList = objects;
-        mResource = R.layout.grade_item;
+        mResource = R.layout.item_grade;
     }
 
     @Override

@@ -50,7 +50,7 @@ public class GroupsGridAdapter extends BaseAdapter {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View gridView;
         if (view == null) {
-            gridView = inflater.inflate(R.layout.grid_view_item, null);
+            gridView = inflater.inflate(R.layout.item_grid_view, null);
             TextView textView = (TextView) gridView.findViewById(R.id.grid_text);
             textView.setText(mGroups.get(i).toString());
         } else {

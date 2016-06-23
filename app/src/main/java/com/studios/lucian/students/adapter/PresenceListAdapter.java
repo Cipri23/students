@@ -22,10 +22,10 @@ public class PresenceListAdapter extends ArrayAdapter<Presence> {
     private final int mResource;
 
     public PresenceListAdapter(Context applicationContext, List<Presence> presences) {
-        super(applicationContext, R.layout.presence_item, presences);
+        super(applicationContext, R.layout.item_presence, presences);
         this.mContext = applicationContext;
         this.presenceList = presences;
-        this.mResource = R.layout.presence_item;
+        this.mResource = R.layout.item_presence;
     }
 
     @Override
