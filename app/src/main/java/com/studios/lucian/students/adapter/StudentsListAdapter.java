@@ -1,6 +1,8 @@
 package com.studios.lucian.students.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,8 +35,9 @@ public class StudentsListAdapter extends ArrayAdapter<Student> {
         this.listener = listener;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View rowView = convertView;
         if (rowView == null) {
             rowView = LayoutInflater.from(mContext).inflate(mResource, parent, false);
@@ -49,27 +52,35 @@ public class StudentsListAdapter extends ArrayAdapter<Student> {
 
         final Student student = getItem(position);
         if (student != null) {
+            Typeface tf = Typeface.createFromAsset(mContext.getAssets(), "fonts/Roboto-Thin.ttf");
             final ViewHolder holder = (ViewHolder) rowView.getTag();
             holder.textViewName.setText(student.toString());
+            holder.textViewName.setTypeface(tf, Typeface.BOLD);
+
             holder.textViewUsername.setText(student.getMatricol());
+            holder.textViewUsername.setTypeface(tf, Typeface.BOLD);
+
             holder.buttonAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     listener.onGradeClick(student);
                 }
             });
+            holder.buttonAdd.setTypeface(tf, Typeface.BOLD);
+
             holder.buttonPresence.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     listener.onPresenceClick(student);
                 }
             });
+            holder.buttonPresence.setTypeface(tf, Typeface.BOLD);
         }
         return rowView;
     }
 
-    static class ViewHolder {
-        public TextView textViewName, textViewUsername;
-        public Button buttonAdd, buttonPresence;
+    private static class ViewHolder {
+        TextView textViewName, textViewUsername;
+        Button buttonAdd, buttonPresence;
     }
 }

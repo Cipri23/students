@@ -1,6 +1,7 @@
 package com.studios.lucian.students.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,8 +52,11 @@ public class GroupsGridAdapter extends BaseAdapter {
         View gridView;
         if (view == null) {
             gridView = inflater.inflate(R.layout.item_grid_view, null);
+            Typeface tf = Typeface.createFromAsset(mContext.getAssets(), "fonts/Roboto-Thin.ttf");
+
             TextView textView = (TextView) gridView.findViewById(R.id.grid_text);
             textView.setText(mGroups.get(i).toString());
+            textView.setTypeface(tf, Typeface.BOLD);
         } else {
             gridView = view;
         }
