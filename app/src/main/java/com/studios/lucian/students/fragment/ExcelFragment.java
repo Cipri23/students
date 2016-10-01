@@ -97,7 +97,7 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
                 }
             }
         }
-        FileExplorerAdapter fileExplorerAdapter = new FileExplorerAdapter(getContext(), item, mPath);
+        FileExplorerAdapter fileExplorerAdapter = new FileExplorerAdapter(getActivity(), item, mPath);
         setListAdapter(fileExplorerAdapter);
     }
 
@@ -122,10 +122,10 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
                     dialogBoxSelectionGroupNumber(file);
                     break;
                 case XLSX:
-                    Toast.makeText(getContext(), NOT_IMPLEMENTED_YET, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), NOT_IMPLEMENTED_YET, Toast.LENGTH_LONG).show();
                     break;
                 default:
-                    Toast.makeText(getContext(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG)
+                    Toast.makeText(getActivity(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG)
                             .show();
                     break;
             }
@@ -134,11 +134,10 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
 
     private void dialogBoxSelectionGroupNumber(final File file) {
 
-        final EditText input = new EditText(getContext());
-        input.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
 
-        new AlertDialog.Builder(getContext())
+        new AlertDialog.Builder(getActivity())
                 .setTitle(DIALOG_TITLE)
                 .setMessage(DIALOG_MESSAGE)
                 .setView(input)
@@ -149,7 +148,7 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
                         if (Validator.isValidGroupNumber(userInput) && !groupExists(userInput)) {
                             handleXlsFile(file, userInput);
                         } else {
-                            DialogsHandler.showWrongGroupNumber(userInput, getContext());
+                            DialogsHandler.showWrongGroupNumber(userInput, getActivity());
                         }
                     }
                 })

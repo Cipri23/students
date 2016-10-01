@@ -15,7 +15,6 @@
         android:layout_marginLeft="5dip"
         android:layout_marginTop="5dip"
         android:layout_toRightOf="@+id/file_icon"
-        android:singleLine="true"
         android:textSize="16sp"
         android:textStyle="bold" />
 

@@ -60,7 +60,7 @@ public class GroupFragment extends ListFragment
     private final View.OnClickListener floatingButtonClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+            final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
             final LayoutInflater inflater = getActivity().getLayoutInflater();
             final View alertView = inflater.inflate(R.layout.dialog_add_student, null);
 
@@ -186,14 +186,14 @@ public class GroupFragment extends ListFragment
             ((MainActivity) getActivity()).getMainFragment().syncGroups();
             mStudentsList.add(student);
             listAdapter.notifyDataSetChanged();
-            Toast.makeText(getContext(), R.string.student_added, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.student_added, Toast.LENGTH_SHORT).show();
         } else {
             showWarning(R.string.student_id_duplicated_title, R.string.student_id_duplicated_message);
         }
     }
 
     private void editStudent(final int id) {
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         final View alertView = inflater.inflate(R.layout.dialog_edit_student, null);
 
@@ -247,7 +247,7 @@ public class GroupFragment extends ListFragment
             mStudentsList.set(id, student);
             listAdapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(getContext(), R.string.error_update_student, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.error_update_student, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -259,20 +259,20 @@ public class GroupFragment extends ListFragment
             mStudentsList.remove(id);
             listAdapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(getContext(), R.string.student_not_found, Toast.LENGTH_SHORT)
+            Toast.makeText(getActivity(), R.string.student_not_found, Toast.LENGTH_SHORT)
                     .show();
         }
     }
 
     private void setAdapter() {
         mStudentsList = mStudentsDbHandler.getStudentsFromGroup(mCurrentGroup.getNumber());
-        listAdapter = new StudentsListAdapter(getContext(), mStudentsList, this);
+        listAdapter = new StudentsListAdapter(getActivity(), mStudentsList, this);
         setListAdapter(listAdapter);
     }
 
     private void showWarning(int errorTitle, int errorMessage) {
         new AlertDialog
-                .Builder(getContext())
+                .Builder(getActivity())
                 .setTitle(errorTitle)
                 .setMessage(errorMessage)
                 .setPositiveButton(R.string.OK, null)

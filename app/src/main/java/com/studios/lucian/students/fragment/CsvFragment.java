@@ -96,7 +96,7 @@ public class CsvFragment extends ListFragment
                 }
             }
         }
-        FileExplorerAdapter fileExplorerAdapter = new FileExplorerAdapter(getContext(), item, mPath);
+        FileExplorerAdapter fileExplorerAdapter = new FileExplorerAdapter(getActivity(), item, mPath);
         setListAdapter(fileExplorerAdapter);
     }
 
@@ -118,20 +118,19 @@ public class CsvFragment extends ListFragment
             if (fileExtension.equals(CSV)) {
                 selectGroupNumberDialogBox(file);
             } else {
-                Toast.makeText(getContext(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG)
+                Toast.makeText(getActivity(), FORMAT_NOT_SUPPORTED + fileExtension, Toast.LENGTH_LONG)
                         .show();
             }
         }
     }
 
     private void selectGroupNumberDialogBox(final File file) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
 
         dialogBuilder.setTitle(DIALOG_TITLE);
         dialogBuilder.setMessage(DIALOG_MESSAGE);
 
-        final EditText input = new EditText(getContext());
-        input.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
         input.setWidth(20);
         dialogBuilder.setView(input);
@@ -143,7 +142,7 @@ public class CsvFragment extends ListFragment
                 if (Validator.isValidGroupNumber(userInput) && !groupExists(userInput)) {
                     handleCsvFile(file, userInput);
                 } else {
-                    DialogsHandler.showWrongGroupNumber(userInput, getContext());
+                    DialogsHandler.showWrongGroupNumber(userInput, getActivity());
                 }
             }
         });

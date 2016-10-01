@@ -52,7 +52,7 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mStudentsDbHandler = new StudentsDbHandler(getContext());
+        mStudentsDbHandler = new StudentsDbHandler(getActivity());
         mGroupDao = new GroupDAO(getActivity());
         mGroups = mGroupDao.getAll();
     }
@@ -70,7 +70,7 @@ public class MainFragment extends Fragment implements AdapterView.OnItemClickLis
         mGridView = (GridView) view.findViewById(R.id.gridview);
         mTextViewEmpty = (TextView) view.findViewById(android.R.id.empty);
 
-        mGroupsGridAdapter = new GroupsGridAdapter(getContext(), mGroups);
+        mGroupsGridAdapter = new GroupsGridAdapter(getActivity(), mGroups);
         mGridView.setAdapter(mGroupsGridAdapter);
         mGridView.setEmptyView(mTextViewEmpty);
         mGridView.setOnItemClickListener(this);
