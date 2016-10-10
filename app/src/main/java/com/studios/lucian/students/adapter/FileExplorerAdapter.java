@@ -32,8 +32,9 @@ public class FileExplorerAdapter extends ArrayAdapter {
         this.paths = paths;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View rowView = convertView;
         if (rowView == null) {
             rowView = LayoutInflater.from(context).inflate(R.layout.item_explorer, parent, false);

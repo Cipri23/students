@@ -32,6 +32,7 @@ import java.util.List;
 /**
  * A simple {@link } subclass.
  */
+@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class CsvFragment extends ListFragment
         implements AdapterView.OnItemClickListener {
 

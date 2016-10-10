@@ -31,6 +31,7 @@ import java.util.List;
 /**
  * Created with love by Lucian and @Pi on 25.01.2016.
  */
+@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class ExcelFragment extends ListFragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = ExcelFragment.class.getSimpleName();
@@ -161,6 +162,7 @@ public class ExcelFragment extends ListFragment implements AdapterView.OnItemCli
                 .show();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean groupExists(String userInput) {
         GroupDAO groupDAO = new GroupDAO(getActivity());
         return groupDAO.find(userInput);

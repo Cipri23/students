@@ -5,6 +5,7 @@ import android.util.Log;
 /**
  * Created with Love by Lucian and Pi on 26.03.2016.
  */
+@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class Validator {
 
     private static final String NAME_FORMAT_REGEX = "[a-zA-z]+([ '-][a-zA-Z]+)*";
@@ -20,6 +21,7 @@ public class Validator {
         }
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isValidName(String s) {
         return s.matches(NAME_FORMAT_REGEX);
     }
