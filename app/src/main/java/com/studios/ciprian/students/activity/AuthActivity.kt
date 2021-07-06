@@ -2,9 +2,9 @@ package com.studios.ciprian.students.activity
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
@@ -21,15 +21,18 @@ class AuthActivity : AppCompatActivity() {
         } else {
             // Choose authentication providers
             val providers = arrayListOf(
-                    AuthUI.IdpConfig.EmailBuilder().build())
+                AuthUI.IdpConfig.EmailBuilder().build()
+            )
 
             startActivityForResult(
-                    AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setAvailableProviders(providers)
-                            .setTheme(R.style.GreenTheme)
-                            .build(),
-                    RC_SIGN_IN)
+                AuthUI.getInstance()
+                    .createSignInIntentBuilder()
+                    .setIsSmartLockEnabled(false)
+                    .setAvailableProviders(providers)
+                    .setTheme(R.style.GreenTheme)
+                    .build(),
+                RC_SIGN_IN
+            )
         }
     }
 
@@ -41,7 +44,7 @@ class AuthActivity : AppCompatActivity() {
 
             if (resultCode == Activity.RESULT_OK) {
                 // Successfully signed in
-                startActivity(Intent(this,MainActivity::class.java))
+                startActivity(Intent(this, MainActivity::class.java))
                 finish()
                 // ...
             } else {
