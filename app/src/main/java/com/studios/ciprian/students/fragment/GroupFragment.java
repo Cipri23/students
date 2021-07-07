@@ -251,7 +251,7 @@ public class GroupFragment extends Fragment implements StudentButtonsListener {
                     @Override
                     public void onSuccess(Void aVoid) {
                         FirebaseFirestore.getInstance().collection("groups")
-                                .document(mCurrentGroup.getNumber())
+                                .document(mCurrentGroup.getId())
                                 .update("studentCount", FieldValue.increment(-1));
                     }
                 });
