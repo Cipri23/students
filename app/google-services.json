@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "327463569408",
+    "project_id": "students-app-99c2d",
+    "storage_bucket": "students-app-99c2d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:327463569408:android:a87e227515d55bebccb0e5",
+        "android_client_info": {
+          "package_name": "com.studios.ciprian.students"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "327463569408-on3ou786gi10ll2nvnsac37dka8cvufl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrOeDSEYX6OQNkoEAhpJ8Ux2ARP_y5sCw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "327463569408-on3ou786gi10ll2nvnsac37dka8cvufl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

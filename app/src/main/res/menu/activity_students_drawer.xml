@@ -10,10 +10,6 @@
             android:id="@+id/nav_excel_file"
             android:icon="@drawable/excel"
             android:title="@string/students_from_excel" />
-        <item
-            android:id="@+id/nav_csv_file"
-            android:icon="@drawable/csv"
-            android:title="@string/students_from_csv" />
     </group>
 
 </menu>

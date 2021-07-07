@@ -1,83 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:descendantFocusability="blocksDescendants"
-    android:orientation="horizontal"
-    android:padding="1dip">
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardElevation="3dp">
 
-    <!--  ListRow Left side Thumbnail image -->
-    <LinearLayout
-        android:id="@+id/thumbnail"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginEnd="2dp"
-        android:layout_marginRight="2dp">
+        android:descendantFocusability="blocksDescendants"
+        android:orientation="horizontal"
+        android:padding="5dp">
 
-        <ImageView
-            android:id="@+id/icon"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:src="@drawable/ic_person_outline_black_48dp" />
-    </LinearLayout>
+        <!--  ListRow Left side Thumbnail image -->
+        <LinearLayout
+            android:id="@+id/thumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginEnd="2dp"
+            android:layout_marginRight="2dp">
 
-    <!-- Student Name -->
-    <TextView
-        android:id="@+id/student_name_layout"
-        android:layout_width="240dp"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/thumbnail"
-        android:layout_toEndOf="@+id/thumbnail"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:ellipsize="end"
-        android:fontFamily="sans-serif-light"
-        android:maxLines="1"
-        android:textColor="@android:color/black"
-        android:textSize="18sp"
-        android:textStyle="normal"
-        android:typeface="sans" />
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:src="@drawable/ic_person_outline_black_48dp" />
+        </LinearLayout>
 
-    <!-- Matricol -->
-    <TextView
-        android:id="@+id/student_username_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/student_name_layout"
-        android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
-        android:gravity="end"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="12sp"
-        android:textStyle="normal" />
+        <!-- Student Name -->
+        <TextView
+            android:id="@+id/student_name_layout"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/thumbnail"
+            android:layout_toEndOf="@+id/thumbnail"
+            android:layout_toRightOf="@+id/thumbnail"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:maxLines="1"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="normal"
+            android:typeface="sans" />
 
-    <Button
-        android:id="@+id/student_list_button_1"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/thumbnail"
-        android:layout_toEndOf="@+id/thumbnail"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:text="@string/student_list_button_1"
-        android:textColor="@color/button_color" />
+        <!-- Matricol -->
+        <TextView
+            android:id="@+id/student_username_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/student_name_layout"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:gravity="end"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12sp"
+            android:textStyle="normal" />
 
-    <Button
-        android:id="@+id/student_list_button_2"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false"
-        android:layout_below="@+id/thumbnail"
-        android:layout_toEndOf="@+id/student_list_button_1"
-        android:layout_toRightOf="@+id/student_list_button_1"
-        android:text="@string/presence"
-        android:textColor="@color/button_color" />
+        <Button
+            android:id="@+id/student_list_button_1"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/thumbnail"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_toEndOf="@+id/thumbnail"
+            android:layout_toRightOf="@+id/thumbnail"
+            android:text="@string/student_list_button_1"
+            android:textColor="@color/button_color" />
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/student_list_button_2"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/thumbnail"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentLeft="false"
+            android:layout_toEndOf="@+id/student_list_button_1"
+            android:layout_toRightOf="@+id/student_list_button_1"
+            android:text="@string/presence"
+            android:textColor="@color/button_color" />
+
+        <TextView
+            android:id="@+id/student_presences_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/thumbnail"
+            android:layout_alignBottom="@id/student_list_button_2"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12sp"
+            android:textStyle="normal"
+            tools:text="csacs" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
