@@ -2,11 +2,12 @@ package com.studios.ciprian.students.util;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.studios.ciprian.students.R;
 import com.studios.ciprian.students.model.Grade;
@@ -122,54 +123,4 @@ public class DialogsHandler {
                 .create()
                 .show();
     }
-
-//    private void addGradeInDrive(final Grade grade) {
-//        if (mGoogleApiClient == null) {
-//            Log.i(TAG, "addGrade: googleApiClient is null");
-//            return;
-//        }
-//        final Student student = mStudentsDbHandler.findStudent(grade.getMatricol());
-//        if (student == null) {
-//            Log.i(TAG, "addGrade: findStudent returned null!!");
-//            return;
-//        }
-//
-//        DriveId driveId = DriveId.decodeFromString(student.getDriveFileId());
-//        DriveFile driveFile = driveId.asDriveFile();
-//
-//        driveFile.open(mGoogleApiClient, DriveFile.MODE_READ_WRITE, null).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-//            @Override
-//            public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
-//                if (!driveContentsResult.getStatus().isSuccess()) {
-//                    Log.i(TAG, "onResult: opening file returned an error");
-//                    return;
-//                }
-//                DriveContents driveContents = driveContentsResult.getDriveContents();
-//                try {
-//                    ParcelFileDescriptor parcelFileDescriptor = driveContents.getParcelFileDescriptor();
-//
-//                    FileInputStream fileInputStream = new FileInputStream(parcelFileDescriptor.getFileDescriptor());
-//                    fileInputStream.read(new byte[fileInputStream.available()]);
-//
-//                    Log.i(TAG, "onResult: number of bytes available: " + fileInputStream.available());
-//
-//                    FileOutputStream fileOutputStream = new FileOutputStream(parcelFileDescriptor.getFileDescriptor());
-//                    Writer writer = new OutputStreamWriter(fileOutputStream);
-//                    writer.write(student.toString() + ". On " + grade.getDate() + " was graded with " +
-//                            grade.getGrade() + " at lab number " + grade.getLabNumber());
-//                    // TODO consider adding end line before flushing
-//                    writer.close();
-//
-//                    driveContents.commit(mGoogleApiClient, null).setResultCallback(new ResultCallback<Status>() {
-//                        @Override
-//                        public void onResult(@NonNull Status result) {
-//                            Log.i(TAG, "onResult: result = " + result.getStatus());
-//                        }
-//                    });
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
 }
