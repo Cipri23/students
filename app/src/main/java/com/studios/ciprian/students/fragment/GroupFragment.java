@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.firebase.ui.firestore.SnapshotParser;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -135,7 +136,18 @@ public class GroupFragment extends Fragment implements StudentButtonsListener {
                 .orderBy("name");
 
         FirestoreRecyclerOptions<Student> options = new FirestoreRecyclerOptions.Builder<Student>()
-                .setQuery(query, Student.class)
+                .setQuery(
+                        query,
+                        new SnapshotParser<Student>() {
+                            @NonNull
+                            @NotNull
+                            @Override
+                            public Student parseSnapshot(@NonNull @NotNull DocumentSnapshot snapshot) {
+                                Student student = snapshot.toObject(Student.class);
+                                student.setId(snapshot.getId());
+                                return student;
+                            }
+                        })
                 .setLifecycleOwner(this)
                 .build();
 
@@ -197,16 +209,16 @@ public class GroupFragment extends Fragment implements StudentButtonsListener {
     private void addNewStudent(String matricol, String name, String surname, String email) {
         final Student student = new Student(mCurrentGroup.getNumber(), matricol, name, surname, email);
         FirebaseFirestore.getInstance().collection("students")
-                .document(student.getMatricol())
+                .whereEqualTo("matricol", student.getMatricol())
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
+                    public void onSuccess(QuerySnapshot documentSnapshot) {
+                        if (!documentSnapshot.isEmpty()) {
                             showWarning(R.string.student_id_duplicated_title, R.string.student_id_duplicated_message);
                         } else {
                             FirebaseFirestore.getInstance().collection("students")
-                                    .document(student.getMatricol())
+                                    .document()
                                     .set(student)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
@@ -221,7 +233,7 @@ public class GroupFragment extends Fragment implements StudentButtonsListener {
 
     private void increaseGroupCount() {
         FirebaseFirestore.getInstance().collection("groups")
-                .document(mCurrentGroup.getNumber())
+                .document(mCurrentGroup.getId())
                 .update("studentCount", FieldValue.increment(1))
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -230,69 +242,10 @@ public class GroupFragment extends Fragment implements StudentButtonsListener {
                     }
                 });
     }
-//
-//    private void editStudent(final int id) {
-//        final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-//        final LayoutInflater inflater = getActivity().getLayoutInflater();
-//        final View alertView = inflater.inflate(R.layout.dialog_edit_student, null);
-//
-//        TextView dialogStudentName = (TextView) alertView.findViewById(R.id.dialog_student_name);
-//        final TextView dialogMatricolNumber = (TextView) alertView.findViewById(R.id.dialog_matricol_number);
-//        final EditText dialogName = (EditText) alertView.findViewById(R.id.dialog_edit_name);
-//        final EditText dialogSurname = (EditText) alertView.findViewById(R.id.dialog_edit_surname);
-//
-////        final Student student = mStudentsList.get(id);
-////
-////        dialogStudentName.setText(student.toString());
-////        dialogMatricolNumber.setText(student.getMatricol());
-////
-////        dialog.setView(alertView)
-////                .setPositiveButton(R.string.button_update_student, new DialogInterface.OnClickListener() {
-////                    @Override
-////                    public void onClick(DialogInterface dialogInterface, int i) {
-////                        boolean inputsAreOk = true;
-////                        if (!Validator.isValidName(dialogName.getText().toString())) {
-////                            inputsAreOk = false;
-////                            dialogName.setError("Invalid Name");
-////                        }
-////                        if (!Validator.isValidName(dialogSurname.getText().toString())) {
-////                            inputsAreOk = false;
-////                            dialogSurname.setError("Invalid Surname");
-////                        }
-////                        if (inputsAreOk) {
-////                            updateStudent(
-////                                    id,
-////                                    dialogMatricolNumber.getText().toString(),
-////                                    dialogName.getText().toString(),
-////                                    dialogSurname.getText().toString());
-////                        } else {
-////                            showWarning(R.string.error_update_student_title, R.string.error_update_student_message);
-////                        }
-////                    }
-////                })
-////                .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-////                    @Override
-////                    public void onClick(DialogInterface dialogInterface, int i) {
-////                        dialogInterface.dismiss();
-////                    }
-////                })
-////                .create()
-////                .show();
-//    }
-//
-//    private void updateStudent(int id, String matricol, String name, String surname) {
-////        Student student = new Student(mCurrentGroup.getNumber(), matricol, name, surname);
-////        if (mStudentsDbHandler.updateStudent(student)) {
-////            mStudentsList.set(id, student);
-////            listAdapter.notifyDataSetChanged();
-////        } else {
-////            Toast.makeText(getActivity(), R.string.error_update_student, Toast.LENGTH_SHORT).show();
-////        }
-//    }
 
     private void deleteStudent(Student student) {
         FirebaseFirestore.getInstance().collection("students")
-                .document(student.getMatricol())
+                .document(student.getId())
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

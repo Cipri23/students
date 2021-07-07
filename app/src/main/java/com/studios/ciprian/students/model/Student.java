@@ -12,6 +12,7 @@ public class Student implements Serializable {
     private String surname;
     private String email;
     private String owner;
+    private String id;
 
     public Student() {
     }
@@ -76,5 +77,13 @@ public class Student implements Serializable {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }

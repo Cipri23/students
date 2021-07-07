@@ -22,11 +22,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.firebase.ui.firestore.SnapshotParser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 import com.studios.ciprian.students.R;
@@ -76,16 +78,36 @@ public class MainFragment extends Fragment {
 
         FirestoreRecyclerOptions<Group> options;
 
-        options = (Validator.userIsStudent()) ?
+        options = Validator.userIsStudent() ?
                 new FirestoreRecyclerOptions.Builder<Group>()
-                        .setQuery(FirebaseFirestore.getInstance().collection("groups"), Group.class)
+                        .setQuery(
+                                FirebaseFirestore.getInstance().collection("groups"),
+                                new SnapshotParser<Group>() {
+                                    @NonNull
+                                    @NotNull
+                                    @Override
+                                    public Group parseSnapshot(@NonNull @NotNull DocumentSnapshot snapshot) {
+                                        Group group = snapshot.toObject(Group.class);
+                                        group.setId(snapshot.getId());
+                                        return group;
+                                    }
+                                })
                         .setLifecycleOwner(this)
                         .build()
                 : new FirestoreRecyclerOptions.Builder<Group>()
                 .setQuery(
                         FirebaseFirestore.getInstance().collection("groups")
                                 .whereEqualTo("owner", FirebaseAuth.getInstance().getCurrentUser().getEmail()),
-                        Group.class
+                        new SnapshotParser<Group>() {
+                            @NonNull
+                            @NotNull
+                            @Override
+                            public Group parseSnapshot(@NonNull @NotNull DocumentSnapshot snapshot) {
+                                Group group = snapshot.toObject(Group.class);
+                                group.setId(snapshot.getId());
+                                return group;
+                            }
+                        }
                 )
                 .setLifecycleOwner(this)
                 .build();

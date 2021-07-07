@@ -9,6 +9,7 @@ public class Group implements Serializable {
     private String driveFileId;
     private int studentCount;
     private String owner;
+    private String id;
 
     public Group() {}
 
@@ -65,5 +66,13 @@ public class Group implements Serializable {
 
     public String toStringggg() {
         return "Group: " + number + " Students: " + studentCount + " Drive id = " + driveFileId;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }
