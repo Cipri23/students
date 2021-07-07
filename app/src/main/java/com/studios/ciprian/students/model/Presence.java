@@ -1,9 +1,12 @@
 package com.studios.ciprian.students.model;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class Presence {
     private String matricol;
     private int labNumber;
     private String date;
+    private String owner;
 
     public Presence() {
     }
@@ -12,6 +15,7 @@ public class Presence {
         this.matricol = matricol;
         this.labNumber = value;
         this.date = date;
+        this.owner = FirebaseAuth.getInstance().getCurrentUser().getEmail();
     }
 
     @Override
@@ -37,5 +41,13 @@ public class Presence {
 
     public String getToastDisplay(Student student) {
         return student.toString() + " was marked as present.";
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getOwner() {
+        return owner;
     }
 }

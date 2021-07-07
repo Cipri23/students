@@ -131,6 +131,7 @@ public class GroupFragment extends Fragment implements StudentButtonsListener {
     private void setAdapter() {
         Query query = FirebaseFirestore.getInstance().collection("students")
                 .whereEqualTo("groupNumber", mCurrentGroup.getNumber())
+                .whereEqualTo("owner", FirebaseAuth.getInstance().getCurrentUser().getEmail())
                 .orderBy("name");
 
         FirestoreRecyclerOptions<Student> options = new FirestoreRecyclerOptions.Builder<Student>()

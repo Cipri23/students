@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.studios.ciprian.students.R;
@@ -55,6 +56,7 @@ public class GradesFragment extends Fragment {
 
         Query query = FirebaseFirestore.getInstance().collection("grades")
                 .whereEqualTo("matricol", mMatricol)
+                .whereEqualTo("owner", FirebaseAuth.getInstance().getCurrentUser().getEmail())
                 .orderBy("date");
 
         FirestoreRecyclerOptions<Grade> options = new FirestoreRecyclerOptions.Builder<Grade>()

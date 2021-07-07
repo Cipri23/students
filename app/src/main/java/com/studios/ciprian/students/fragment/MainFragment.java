@@ -25,6 +25,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
@@ -33,7 +34,7 @@ import com.studios.ciprian.students.activity.AuthActivity;
 import com.studios.ciprian.students.adapter.GroupsAdapter;
 import com.studios.ciprian.students.model.Group;
 import com.studios.ciprian.students.model.Student;
-import com.studios.ciprian.students.util.parser.CsvParser;
+import com.studios.ciprian.students.util.Validator;
 import com.studios.ciprian.students.util.parser.ExcelParser;
 
 import org.jetbrains.annotations.NotNull;
@@ -69,12 +70,23 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NotNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final RecyclerView mGridView = (RecyclerView) view.findViewById(R.id.gridview);
+        final RecyclerView mGridView = view.findViewById(R.id.gridview);
         mGridView.setLayoutManager(new GridLayoutManager(requireContext(), 2));
-        mTextViewEmpty = (TextView) view.findViewById(R.id.empty);
+        mTextViewEmpty = view.findViewById(R.id.empty);
 
-        FirestoreRecyclerOptions<Group> options = new FirestoreRecyclerOptions.Builder<Group>()
-                .setQuery(FirebaseFirestore.getInstance().collection("groups"), Group.class)
+        FirestoreRecyclerOptions<Group> options;
+
+        options = (Validator.userIsStudent()) ?
+                new FirestoreRecyclerOptions.Builder<Group>()
+                        .setQuery(FirebaseFirestore.getInstance().collection("groups"), Group.class)
+                        .setLifecycleOwner(this)
+                        .build()
+                : new FirestoreRecyclerOptions.Builder<Group>()
+                .setQuery(
+                        FirebaseFirestore.getInstance().collection("groups")
+                                .whereEqualTo("owner", FirebaseAuth.getInstance().getCurrentUser().getEmail()),
+                        Group.class
+                )
                 .setLifecycleOwner(this)
                 .build();
 
@@ -164,11 +176,11 @@ public class MainFragment extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         WriteBatch batch = FirebaseFirestore.getInstance().batch();
 
-        DocumentReference groupRef = db.collection("groups").document(group.getNumber());
+        DocumentReference groupRef = db.collection("groups").document();
         batch.set(groupRef, group);
 
         for (Student student : studentList) {
-            DocumentReference nycRef = db.collection("students").document(student.getMatricol());
+            DocumentReference nycRef = db.collection("students").document();
             batch.set(nycRef, student);
         }
 

@@ -4,11 +4,14 @@ package com.studios.ciprian.students.model;
 //obiectele care repr datele:note pt un student,,grup,prezenta,student
 
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class Grade {
     private String matricol;
     private int grade;
     private int labNumber;
     private String date;
+    private String owner;
 
     public Grade() {
     }
@@ -18,6 +21,7 @@ public class Grade {
         this.grade = grade;
         this.labNumber = labNumber;
         this.date = date;
+        this.owner = FirebaseAuth.getInstance().getCurrentUser().getEmail();
     }
 
     public String getDate() {
@@ -64,5 +68,13 @@ public class Grade {
 
     public String getToastDisplay(Student student) {
         return student.toString() + " was graded with " + grade;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getOwner() {
+        return owner;
     }
 }

@@ -1,11 +1,14 @@
 package com.studios.ciprian.students.model;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.io.Serializable;
 
 public class Group implements Serializable {
     private String number;
     private String driveFileId;
     private int studentCount;
+    private String owner;
 
     public Group() {}
 
@@ -13,12 +16,14 @@ public class Group implements Serializable {
         this.number = number;
         this.driveFileId = driveFileId;
         this.studentCount = studentCount;
+        this.owner = FirebaseAuth.getInstance().getCurrentUser().getEmail();
     }
 
     public Group(String number, int studentCount) {
         this.number = number;
         this.studentCount = studentCount;
         this.driveFileId = "";
+        this.owner = FirebaseAuth.getInstance().getCurrentUser().getEmail();
     }
 
     @Override
@@ -48,6 +53,14 @@ public class Group implements Serializable {
 
     public void setStudentCount(int studentCount) {
         this.studentCount = studentCount;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getOwner() {
+        return owner;
     }
 
     public String toStringggg() {
