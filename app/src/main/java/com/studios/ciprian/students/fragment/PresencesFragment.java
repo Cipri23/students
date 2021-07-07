@@ -17,6 +17,7 @@ import com.google.firebase.firestore.Query;
 import com.studios.ciprian.students.R;
 import com.studios.ciprian.students.adapter.PresenceListAdapter;
 import com.studios.ciprian.students.model.Presence;
+import com.studios.ciprian.students.util.Validator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -56,12 +57,14 @@ public class PresencesFragment extends Fragment {
         mEmptyText = view.findViewById(android.R.id.empty);
 
         Query query = FirebaseFirestore.getInstance().collection("presences")
-                .whereEqualTo("matricol", mMatricol)
-                .whereEqualTo("owner", FirebaseAuth.getInstance().getCurrentUser().getEmail())
-                .orderBy("date");
+                .whereEqualTo("matricol", mMatricol);
+
+        if (!Validator.userIsStudent()) {
+            query.whereEqualTo("owner", FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        }
 
         FirestoreRecyclerOptions<Presence> options = new FirestoreRecyclerOptions.Builder<Presence>()
-                .setQuery(query, Presence.class)
+                .setQuery(query.orderBy("date"), Presence.class)
                 .setLifecycleOwner(this)
                 .build();
 
