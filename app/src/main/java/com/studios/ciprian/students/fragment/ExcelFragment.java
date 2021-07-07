@@ -3,14 +3,6 @@ package com.studios.ciprian.students.fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
-
-import androidx.annotation.Nullable;
-
-import com.google.android.material.navigation.NavigationView;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.ListFragment;
-
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,12 +12,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.ListFragment;
+
+import com.google.android.material.navigation.NavigationView;
 import com.studios.ciprian.students.R;
 import com.studios.ciprian.students.activity.MainActivity;
 import com.studios.ciprian.students.adapter.FileExplorerAdapter;
-import com.studios.ciprian.students.repository.GroupDAO;
 import com.studios.ciprian.students.util.DialogsHandler;
-import com.studios.ciprian.students.util.StudentsDbHandler;
 import com.studios.ciprian.students.util.Validator;
 
 import java.io.File;

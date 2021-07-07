@@ -19,7 +19,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.studios.ciprian.students.R;
-import com.studios.ciprian.students.fragment.CsvFragment;
 import com.studios.ciprian.students.fragment.ExcelFragment;
 import com.studios.ciprian.students.fragment.MainFragment;
 
@@ -102,12 +101,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private boolean returnToMainFragmentFromBackStack() {
-        CsvFragment csvFragment = (CsvFragment) getSupportFragmentManager().findFragmentByTag("CSVF");
         ExcelFragment excelFragment = (ExcelFragment) getSupportFragmentManager().findFragmentByTag("EF");
 
-        if (csvFragment != null && csvFragment.isVisible()) {
-            getSupportFragmentManager().beginTransaction().remove(csvFragment).commit();
-        }
         if (excelFragment != null && excelFragment.isVisible()) {
             getSupportFragmentManager().beginTransaction().remove(excelFragment).commit();
         }

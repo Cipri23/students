@@ -287,6 +287,7 @@ public class GroupFragment extends Fragment implements StudentButtonsListener {
         FirebaseFirestore.getInstance().collection("grades")
                 .whereEqualTo("labNumber", grade.getLabNumber())
                 .whereEqualTo("matricol", grade.getMatricol())
+                .whereEqualTo("owner", FirebaseAuth.getInstance().getCurrentUser().getEmail())
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -318,6 +319,7 @@ public class GroupFragment extends Fragment implements StudentButtonsListener {
         FirebaseFirestore.getInstance().collection("presences")
                 .whereEqualTo("labNumber", presence.getLabNumber())
                 .whereEqualTo("matricol", presence.getMatricol())
+                .whereEqualTo("owner", FirebaseAuth.getInstance().getCurrentUser().getEmail())
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
